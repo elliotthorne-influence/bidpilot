@@ -360,8 +360,7 @@ async function loadTenders(){
     TENDERS = FALLBACK.map(normalise);
     showFeedState("error", {message:err.message});
   }
-  renderList();
-  renderAgenda();
+  await loadPipeline();
 }
 
 /* Surface feed status in the Discover sub-header + banner.             */
@@ -410,7 +409,6 @@ async function loadPipeline(){
   renderList();
   renderAgenda();
 }
-loadPipeline();
 const records  = [];
 let activeFilter = "all";
 let searchTerm   = "";
@@ -476,11 +474,16 @@ grid.addEventListener("click", e => {
   pursue(btn.dataset.id);
 });
 
-function pursue(id){
+async function pursue(id){
   if(pipeline.has(id)) return;
   pipeline.add(id);
   const t = TENDERS.find(x => x.id === id);
-  toast(`Added to pipeline: ${t.buyer}`);
+  // Save to Supabase so it persists and the whole team sees it
+  const { error } = await sbClient
+    .from("pipeline")
+    .insert({ tender_id: id, added_by: "team" });
+  if(error) console.warn("Pipeline save failed:", error.message);
+  toast(`Added to pipeline: ${t?.buyer ?? id}`);
   renderList();
   renderAgenda();
 }
