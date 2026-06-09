@@ -318,18 +318,19 @@ function portalUrl(rec) {
   const raw = rec.url ?? "";
   const title = rec.title ?? "";
   const src = rec.source ?? rec.src ?? "";
-
-  // A real notice URL contains /Notice/ or /notice/ or has a long path
-  const looksReal = raw.includes("/Notice/") || raw.includes("/notice/") ||
-                    (raw.includes("contractsfinder") && raw.includes("/Published/Notice/"));
-
-  if (looksReal) return raw;
-
-  // Fall back to a pre-filled search on the right portal
   const encoded = encodeURIComponent(title);
+
+  // Contracts Finder: use the direct URL if the API provided a real notice link,
+  // otherwise fall back to a pre-filled search
   if (src === "Contracts Finder" || raw.includes("contractsfinder")) {
-    return `https://www.contractsfinder.service.gov.uk/Search/Results?keyword=${encoded}`;
+    const cfReal = raw.includes("/Published/Notice/") || raw.includes("/notice/");
+    return cfReal
+      ? raw
+      : `https://www.contractsfinder.service.gov.uk/Search/Results?keyword=${encoded}`;
   }
+
+  // Find a Tender: always use pre-filled search — the API notice IDs are
+  // unreliable so direct /Notice/ URLs frequently 404
   return `https://www.find-tender.service.gov.uk/Search/Results?searchTerms=${encoded}`;
 }
 
