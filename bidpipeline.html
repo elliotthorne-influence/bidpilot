@@ -395,6 +395,21 @@ const TODAY = (() => { const d = new Date(); d.setHours(0,0,0,0); return d; })()
 
 /* ---- app state ---- */
 const pipeline = new Set();
+
+/* Supabase client for pipeline writes (same project, publishable key) */
+const sbClient = window.supabase.createClient(
+  "https://hoefxgoakftdwkpselmo.supabase.co",
+  "sb_publishable_EsZ9peq33J4eLRkPstcGtg_-WI3rTda"
+);
+
+/* Load existing pipeline from Supabase on startup */
+async function loadPipeline(){
+  const { data } = await sbClient.from("pipeline").select("tender_id");
+  if(data) data.forEach(row => pipeline.add(row.tender_id));
+  renderList();
+  renderAgenda();
+}
+loadPipeline();
 const records  = [];
 let activeFilter = "all";
 let searchTerm   = "";
