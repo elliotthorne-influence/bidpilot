@@ -457,7 +457,7 @@ function renderList(){
           ${t.s   ? `<div class="date ${subDays < 14 ? "urgent" : ""}"><div class="k">Submission</div><div class="v">${fmtShort(t.s)}</div></div>` : ""}
         </div>
         <div class="cardfoot">
-          <button class="btn primary js-pursue ${added ? "added" : ""}" data-id="${esc(String(t.id))}" ${added ? "disabled" : ""}>
+          <button class="btn primary js-pursue ${added ? "added" : ""}" data-id="${esc(String(t.id))}">
             ${added ? "&#10003; In pipeline" : "Pursue &#10142;"}
           </button>
           <a class="btn portal" href="${esc(t.url)}" target="_blank" rel="noopener noreferrer"
@@ -471,7 +471,11 @@ function renderList(){
 grid.addEventListener("click", e => {
   const btn = e.target.closest(".js-pursue");
   if(!btn) return;
-  pursue(btn.dataset.id);
+  if(pipeline.has(btn.dataset.id)){
+    removeFromPipeline(btn.dataset.id);
+  } else {
+    pursue(btn.dataset.id);
+  }
 });
 
 async function pursue(id){
@@ -484,6 +488,24 @@ async function pursue(id){
     .insert({ tender_id: id, added_by: "team" });
   if(error) console.warn("Pipeline save failed:", error.message);
   toast(`Added to pipeline: ${t?.buyer ?? id}`);
+  renderList();
+  renderAgenda();
+}
+
+/* event delegation for remove buttons */
+agenda.addEventListener("click", e => {
+  const btn = e.target.closest(".js-remove");
+  if(!btn) return;
+  removeFromPipeline(btn.dataset.id);
+});
+
+async function removeFromPipeline(id){
+  pipeline.delete(id);
+  const { error } = await sbClient
+    .from("pipeline")
+    .delete()
+    .eq("tender_id", id);
+  if(error) console.warn("Pipeline remove failed:", error.message);
   renderList();
   renderAgenda();
 }
@@ -551,6 +573,7 @@ function eventChip(ev, key){
         <p class="syn">${esc(t.syn)}</p>
         <a class="btn portal" href="${esc(t.url)}" target="_blank" rel="noopener noreferrer"
            aria-label="View ${esc(t.buyer)} notice on ${esc(t.src)} (opens in new tab)">View on portal &#8599;</a>
+        <button class="btn js-remove" data-id="${esc(String(t.id))}" style="margin-top:8px;background:#fff;border:1px solid #ccc;color:#666;">&#10005; Remove from pipeline</button>
       </div>
     </div>`;
 }
