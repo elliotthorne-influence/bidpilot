@@ -286,9 +286,9 @@ function normalise(rec, i){
   const title = rec.title ?? rec.tender?.title ?? "Untitled notice";
   const buyer = rec.buyer ?? rec.tender?.buyer ?? "";
   const syn   = rec.description ?? rec.synopsis ?? rec.syn ?? "";
-  const q     = rec.questionDeadline   ?? rec.q ?? null;
-  const s     = rec.submissionDeadline ?? rec.s ?? null;
-  const pre   = rec.preEngagement ?? rec.pre ?? null;
+  const q     = rec.questionDeadline   ?? rec.question_deadline  ?? rec.q ?? null;
+  const s     = rec.submissionDeadline ?? rec.submission_deadline ?? rec.s ?? null;
+  const pre   = rec.preEngagement ?? rec.pre_engagement ?? rec.pre ?? null;
 
   // Derive the dominant stage from which dates exist / are still ahead.
   let stage = rec.stage;
@@ -339,17 +339,22 @@ function portalUrl(rec) {
   }
   return `https://www.find-tender.service.gov.uk/Search/Results?searchTerms=${encoded}`;
 }
-/* Load the feed, normalise, render. Falls back to the bundled sample.  */
+/* Load the feed from Supabase, normalise, render. Falls back to bundled sample. */
 async function loadTenders(){
   showFeedState("loading");
   try{
-    const res = await fetch("tenders.json?v=" + Date.now(), {cache:"no-store"});
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
-    const raw = await res.json();
-    const rows = Array.isArray(raw) ? raw : (raw.tenders ?? raw.results ?? []);
-    if(!rows.length) throw new Error("empty feed");
-    TENDERS = rows.map(normalise);
-    showFeedState("ok", {count:TENDERS.length, generatedAt:raw.generatedAt});
+    const sb = window.supabase.createClient(
+      "https://hoefxgoakftdwkpselmo.supabase.co",
+      "sb_publishable_EsZ9peq33J4eLRkPstcGtg_-WI3rTda"
+    );
+    const { data, error } = await sb
+      .from("tenders")
+      .select("*")
+      .order("submission_deadline", { ascending: true });
+    if(error) throw new Error(error.message);
+    if(!data.length) throw new Error("empty feed");
+    TENDERS = data.map(normalise);
+    showFeedState("ok", {count:TENDERS.length, generatedAt:new Date().toISOString()});
   }catch(err){
     TENDERS = FALLBACK.map(normalise);
     showFeedState("error", {message:err.message});
