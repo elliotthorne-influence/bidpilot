@@ -1,18 +1,7 @@
 {
-  "generatedAt": "2026-06-09T09:33:35.176Z",
-  "count": 83,
+  "generatedAt": "2026-06-09T10:31:05.128Z",
+  "count": 74,
   "tenders": [
-    {
-      "id": "ocds-h6vhtk-06a810",
-      "source": "Find a Tender",
-      "title": "Recruitment, Advertisement/ Promotion and Engagement",
-      "buyer": "North East Ambulance Service NHS Foundation Trust",
-      "description": "North East Ambulance Service (NEAS) is seeking to appoint an experienced, innovative brand communications company with the expertise to help develop and deliver a comprehensive recruitment marketing strategy. Support is needed in executing recruitment campaigns that will address our immediate and long-term recruitment needs and help us achieve critical staffing levels across the service. We require additional capacity and dedicated support to attract applicants to the service and increase applications by advertising the Trust as an employer, key job opportunities available and vacancies, both ",
-      "preEngagement": null,
-      "questionDeadline": "2026-05-29T12:00:00+01:00",
-      "submissionDeadline": "2026-06-10T12:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/06a810"
-    },
     {
       "id": "ocds-h6vhtk-0692a0",
       "source": "Find a Tender",
@@ -22,7 +11,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-05T14:00:00+01:00",
       "submissionDeadline": "2026-06-11T12:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/0692a0"
+      "url": "https://www.find-tender.service.gov.uk/Notice/20260001"
     },
     {
       "id": "ocds-h6vhtk-066b64",
@@ -33,18 +22,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-05T12:00:00+01:00",
       "submissionDeadline": "2026-06-12T12:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/066b64"
-    },
-    {
-      "id": "ocds-h6vhtk-069543",
-      "source": "Find a Tender",
-      "title": "Content Management System for Parliament Procedural Publishing Unit",
-      "buyer": "Corporate Officer of the House of Commons",
-      "description": "The Authority is seeking to engage with the publication digital agency for replacement of the Content Management System within the UK Parliament’s Hansard publishing workflow. The Authority's Conditions of Participation are included within the tender documentation.",
-      "preEngagement": null,
-      "questionDeadline": "2026-05-22T12:00:00+01:00",
-      "submissionDeadline": "2026-06-12T16:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/069543"
+      "url": "https://www.find-tender.service.gov.uk/Notice/1329"
     },
     {
       "id": "ocds-h6vhtk-067e50",
@@ -55,7 +33,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-09T17:00:00+01:00",
       "submissionDeadline": "2026-06-15T12:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/067e50"
+      "url": "https://www.find-tender.service.gov.uk/Notice/606750"
     },
     {
       "id": "ocds-h6vhtk-069dd4",
@@ -66,7 +44,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-10T17:00:00+01:00",
       "submissionDeadline": "2026-06-17T12:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/069dd4"
+      "url": "https://www.find-tender.service.gov.uk/Notice/60694"
     },
     {
       "id": "ocds-h6vhtk-06b015",
@@ -77,7 +55,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": "2026-06-19",
-      "url": "https://www.find-tender.service.gov.uk/Notice/06b015"
+      "url": "https://www.find-tender.service.gov.uk/Notice/606015"
     },
     {
       "id": "ocds-h6vhtk-06adda",
@@ -88,7 +66,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-17T12:00:00+01:00",
       "submissionDeadline": "2026-06-19T12:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/06adda"
+      "url": "https://www.find-tender.service.gov.uk/Notice/995"
     },
     {
       "id": "ocds-h6vhtk-06ab8a",
@@ -99,7 +77,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-12T12:00:00+01:00",
       "submissionDeadline": "2026-06-19T12:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/06ab8a"
+      "url": "https://www.find-tender.service.gov.uk/Notice/447649"
     },
     {
       "id": "ocds-h6vhtk-05efd7",
@@ -110,7 +88,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-05T00:00:00+01:00",
       "submissionDeadline": "2026-06-22T12:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/05efd7"
+      "url": "https://www.find-tender.service.gov.uk/Notice/0187001314"
     },
     {
       "id": "ocds-h6vhtk-06ad17",
@@ -121,7 +99,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-17T16:00:00Z",
       "submissionDeadline": "2026-06-26T08:00:00Z",
-      "url": "https://www.find-tender.service.gov.uk/Notice/06ad17"
+      "url": "https://www.find-tender.service.gov.uk/Notice/04969"
     },
     {
       "id": "ocds-h6vhtk-06b031",
@@ -132,7 +110,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-19T17:00:00+01:00",
       "submissionDeadline": "2026-06-26T12:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/06b031"
+      "url": "https://www.find-tender.service.gov.uk/Notice/817103"
     },
     {
       "id": "ocds-h6vhtk-06a8ca",
@@ -143,7 +121,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": "2026-06-26T12:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/06a8ca"
+      "url": "https://www.find-tender.service.gov.uk/Notice/00000656"
     },
     {
       "id": "ocds-h6vhtk-069acc",
@@ -154,7 +132,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-19T13:00:00+01:00",
       "submissionDeadline": "2026-06-26T13:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/069acc"
+      "url": "https://www.find-tender.service.gov.uk/Notice/449206"
     },
     {
       "id": "ocds-h6vhtk-06ac93",
@@ -165,18 +143,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-19T17:00:00+01:00",
       "submissionDeadline": "2026-06-26T14:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/06ac93"
-    },
-    {
-      "id": "ocds-h6vhtk-06a80a",
-      "source": "Find a Tender",
-      "title": "Rawlinson Street - Remedial Works to Existing External Wall Insulation System and Associated Works",
-      "buyer": "Westmorland and Furness Council",
-      "description": "The Council plans to issue a tender for remedial works to a terrace of residential properties near Barrow town centre, focusing on replacing the existing external wall insulation on the front elevation. Suppliers wishing to express an interest and obtain access to the tender documents should go to www.the-chest.org.uk and click on current opportunities from the navigation area on the left of the screen. On the next screen enter the contract Reference (DN693815) in the box labelled 'contains' then click search. Click on the blue link for the contract title to view the opportunity. To express an",
-      "preEngagement": null,
-      "questionDeadline": null,
-      "submissionDeadline": "2026-06-26T14:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/06a80a"
+      "url": "https://www.find-tender.service.gov.uk/Notice/0022026"
     },
     {
       "id": "ocds-h6vhtk-06aa81",
@@ -187,18 +154,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-19T17:00:00+01:00",
       "submissionDeadline": "2026-06-29T12:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/06aa81"
-    },
-    {
-      "id": "ocds-h6vhtk-06a722",
-      "source": "Find a Tender",
-      "title": "SettleParadigm Pumping Station Servicing, Repair and Maintenance",
-      "buyer": "Paradigm Housing Group",
-      "description": "SettleParadigm wishes to appoint a single supplier across its property portfolio to provide pumping station, cold water booster sets and sewage treatment plant servicing, repair, maintenance and clearing services. The contract will be for a period of 3 years with an option to extend for up to 2 further periods of 12 months each up to a maximum duration of five years. A summary of the scope of Services to be delivered under the Contract will include, but is not limited to: • Provision of Monthly Servicing, Repair, Maintenance and Clearance of Pumping stations, CWBS, and Sewage Treatment plants.",
-      "preEngagement": null,
-      "questionDeadline": "2026-06-22T16:00:00+01:00",
-      "submissionDeadline": "2026-06-29T16:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/06a722"
+      "url": "https://www.find-tender.service.gov.uk/Notice/391"
     },
     {
       "id": "ocds-h6vhtk-06abeb",
@@ -209,7 +165,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-16T12:00:00+01:00",
       "submissionDeadline": "2026-06-30T12:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/06abeb"
+      "url": "https://www.find-tender.service.gov.uk/Notice/447383"
     },
     {
       "id": "ocds-h6vhtk-06ae79",
@@ -220,7 +176,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-19T13:00:00+01:00",
       "submissionDeadline": "2026-06-30T13:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/06ae79"
+      "url": "https://www.find-tender.service.gov.uk/Notice/17239"
     },
     {
       "id": "ocds-h6vhtk-06aa2e",
@@ -231,7 +187,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-17T12:00:00+01:00",
       "submissionDeadline": "2026-07-01T12:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/06aa2e"
+      "url": "https://www.find-tender.service.gov.uk/Notice/1024093027"
     },
     {
       "id": "ocds-h6vhtk-06aa7a",
@@ -242,18 +198,18 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-22T12:00:00+01:00",
       "submissionDeadline": "2026-07-02T12:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/06aa7a"
+      "url": "https://www.find-tender.service.gov.uk/Notice/0376"
     },
     {
       "id": "ocds-h6vhtk-065f95",
       "source": "Find a Tender",
       "title": "UK4 Tender Notice- Assessment of Needs Tool and Digital Platform for Children at Risk of Deprivation of Liberty",
       "buyer": "Department for Education",
-      "description": "The Department for Education invites tenders for the procurement of an Assessment of Needs Tool and integrated digital platform. As part of the work to address these challenges, Department for Education (DfE) is funding three pilot areas to test an integrated systems intervention model. The model brings together children’s social care, health, youth justice, education and other relevant partners to provide earlier, coordinated and evidence based responses for this cohort. At the core of the model is a validated assessment of need tool that provides a holistic picture of each child’s needs, ris",
+      "description": "Department for Education (DfE) invites tenders for the procurement of an Assessment of Needs Tool and integrated digital platform. DfE is funding three pilot areas to test an integrated systems intervention model. The model brings together children’s social care, health, youth justice, education and other relevant partners to provide earlier, coordinated and evidence based responses for children at risk of or subject to deprivation of liberty. At the core of the model is a validated assessment of need tool that provides a holistic picture of each child’s needs, risks, strengths and required su",
       "preEngagement": null,
       "questionDeadline": "2026-06-19T17:00:00+01:00",
       "submissionDeadline": "2026-07-03T12:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/065f95"
+      "url": "https://www.find-tender.service.gov.uk/Notice/10219"
     },
     {
       "id": "ocds-h6vhtk-06690c",
@@ -264,7 +220,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-17T17:00:00+01:00",
       "submissionDeadline": "2026-07-03T17:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/06690c"
+      "url": "https://www.find-tender.service.gov.uk/Notice/10411"
     },
     {
       "id": "ocds-h6vhtk-06af6a",
@@ -275,7 +231,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-25T16:00:00+01:00",
       "submissionDeadline": "2026-07-06T12:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/06af6a"
+      "url": "https://www.find-tender.service.gov.uk/Notice/0379"
     },
     {
       "id": "ocds-h6vhtk-05a238",
@@ -286,7 +242,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-26T12:00:00+01:00",
       "submissionDeadline": "2026-07-06T12:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/05a238"
+      "url": "https://www.find-tender.service.gov.uk/Notice/20250006"
     },
     {
       "id": "ocds-h6vhtk-06904d",
@@ -297,7 +253,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-26T12:00:00+01:00",
       "submissionDeadline": "2026-07-06T12:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/06904d"
+      "url": "https://www.find-tender.service.gov.uk/Notice/444113"
     },
     {
       "id": "ocds-h6vhtk-0600a7",
@@ -308,7 +264,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-29T17:00:00+01:00",
       "submissionDeadline": "2026-07-06T12:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/0600a7"
+      "url": "https://www.find-tender.service.gov.uk/Notice/0082"
     },
     {
       "id": "ocds-h6vhtk-06af00",
@@ -319,7 +275,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-23T17:00:00+00:00",
       "submissionDeadline": "2026-07-06T13:00:00+00:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/06af00"
+      "url": "https://www.find-tender.service.gov.uk/Notice/108702"
     },
     {
       "id": "ocds-h6vhtk-06ada5",
@@ -330,7 +286,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": "2026-07-06T23:59:59+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/06ada5"
+      "url": "https://www.find-tender.service.gov.uk/Notice/6065"
     },
     {
       "id": "ocds-h6vhtk-06b01b",
@@ -341,7 +297,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-29T15:00:00+01:00",
       "submissionDeadline": "2026-07-07T15:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/06b01b"
+      "url": "https://www.find-tender.service.gov.uk/Notice/6318340"
     },
     {
       "id": "ocds-h6vhtk-05f551",
@@ -352,7 +308,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": "2026-07-07T15:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/05f551"
+      "url": "https://www.find-tender.service.gov.uk/Notice/605551"
     },
     {
       "id": "ocds-h6vhtk-06b04d",
@@ -363,7 +319,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-07-01T23:59:59+01:00",
       "submissionDeadline": "2026-07-08T12:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/06b04d"
+      "url": "https://www.find-tender.service.gov.uk/Notice/818511"
     },
     {
       "id": "ocds-h6vhtk-06b047",
@@ -374,7 +330,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-26T17:00:00+01:00",
       "submissionDeadline": "2026-07-08T12:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/06b047"
+      "url": "https://www.find-tender.service.gov.uk/Notice/606047"
     },
     {
       "id": "ocds-h6vhtk-0611eb",
@@ -385,7 +341,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-07-03T17:00:00+01:00",
       "submissionDeadline": "2026-07-09T12:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/0611eb"
+      "url": "https://www.find-tender.service.gov.uk/Notice/260016"
     },
     {
       "id": "ocds-h6vhtk-06aa50",
@@ -396,7 +352,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-19T23:59:00+01:00",
       "submissionDeadline": "2026-07-10T12:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/06aa50"
+      "url": "https://www.find-tender.service.gov.uk/Notice/796561"
     },
     {
       "id": "ocds-h6vhtk-06ae32",
@@ -407,7 +363,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-26T23:59:59+01:00",
       "submissionDeadline": "2026-07-10T23:59:59+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/06ae32"
+      "url": "https://www.find-tender.service.gov.uk/Notice/60632"
     },
     {
       "id": "ocds-h6vhtk-06b039",
@@ -418,7 +374,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-22T12:00:00+01:00",
       "submissionDeadline": "2026-07-17T12:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/06b039"
+      "url": "https://www.find-tender.service.gov.uk/Notice/2025141"
     },
     {
       "id": "ocds-h6vhtk-05a7ab",
@@ -429,18 +385,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-09-10T12:00:00+01:00",
       "submissionDeadline": "2026-09-24T12:00:00+01:00",
-      "url": "https://www.find-tender.service.gov.uk/Notice/05a7ab"
-    },
-    {
-      "id": "ocds-h6vhtk-06b050",
-      "source": "Find a Tender",
-      "title": "Patient Service Centre - CGI IT UK Limited on behalf of Hywel Dda University Health Board (HDUHB)",
-      "buyer": "Hywel Dda University Health Board",
-      "description": "The requirement is driven by the need to provide a single point of access for patients to Health Board services, help patients manage their own health and wellbeing, improve patient experience, reduce duplication and strengthen operational efficiency; giving clinicians and support staff a timely, unified view of the patient across relevant health board systems. The proposed service aligns with the Health Board’s strategic ambitions and national NHS Wales digital priorities and is intended to provide the foundations for future regional integration and service expansion. The PSC is the central p",
-      "preEngagement": null,
-      "questionDeadline": null,
-      "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06b050"
+      "url": "https://www.find-tender.service.gov.uk/Notice/0196"
     },
     {
       "id": "ocds-h6vhtk-06b030",
@@ -451,7 +396,18 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06b030"
+      "url": "https://www.find-tender.service.gov.uk/Notice/105077"
+    },
+    {
+      "id": "ocds-h6vhtk-06b050",
+      "source": "Find a Tender",
+      "title": "Patient Service Centre - CGI IT UK Limited on behalf of Hywel Dda University Health Board (HDUHB)",
+      "buyer": "Hywel Dda University Health Board",
+      "description": "The requirement is driven by the need to provide a single point of access for patients to Health Board services, help patients manage their own health and wellbeing, improve patient experience, reduce duplication and strengthen operational efficiency; giving clinicians and support staff a timely, unified view of the patient across relevant health board systems. The proposed service aligns with the Health Board’s strategic ambitions and national NHS Wales digital priorities and is intended to provide the foundations for future regional integration and service expansion. The PSC is the central p",
+      "preEngagement": null,
+      "questionDeadline": null,
+      "submissionDeadline": null,
+      "url": "https://www.find-tender.service.gov.uk/Notice/003120260617"
     },
     {
       "id": "ocds-h6vhtk-06afd7",
@@ -462,7 +418,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06afd7"
+      "url": "https://www.find-tender.service.gov.uk/Notice/6067"
     },
     {
       "id": "ocds-h6vhtk-06af9e",
@@ -473,7 +429,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06af9e"
+      "url": "https://www.find-tender.service.gov.uk/Notice/002834"
     },
     {
       "id": "ocds-h6vhtk-06a31c",
@@ -484,7 +440,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-11T12:00:00+01:00",
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06a31c"
+      "url": "https://www.find-tender.service.gov.uk/Notice/5646629656"
     },
     {
       "id": "ocds-h6vhtk-06af68",
@@ -495,7 +451,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06af68"
+      "url": "https://www.find-tender.service.gov.uk/Notice/60668"
     },
     {
       "id": "ocds-h6vhtk-06af43",
@@ -506,7 +462,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06af43"
+      "url": "https://www.find-tender.service.gov.uk/Notice/028"
     },
     {
       "id": "ocds-h6vhtk-06af2b",
@@ -517,7 +473,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06af2b"
+      "url": "https://www.find-tender.service.gov.uk/Notice/7162"
     },
     {
       "id": "ocds-h6vhtk-06af2e",
@@ -528,7 +484,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06af2e"
+      "url": "https://www.find-tender.service.gov.uk/Notice/30238"
     },
     {
       "id": "ocds-h6vhtk-06af12",
@@ -539,7 +495,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06af12"
+      "url": "https://www.find-tender.service.gov.uk/Notice/60612"
     },
     {
       "id": "ocds-h6vhtk-06af0c",
@@ -550,7 +506,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06af0c"
+      "url": "https://www.find-tender.service.gov.uk/Notice/085"
     },
     {
       "id": "ocds-h6vhtk-06aebc",
@@ -561,7 +517,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06aebc"
+      "url": "https://www.find-tender.service.gov.uk/Notice/26008"
     },
     {
       "id": "ocds-h6vhtk-06aeb5",
@@ -572,7 +528,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06aeb5"
+      "url": "https://www.find-tender.service.gov.uk/Notice/451248"
     },
     {
       "id": "ocds-h6vhtk-06aea2",
@@ -583,7 +539,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06aea2"
+      "url": "https://www.find-tender.service.gov.uk/Notice/19535"
     },
     {
       "id": "ocds-h6vhtk-06ae45",
@@ -594,7 +550,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06ae45"
+      "url": "https://www.find-tender.service.gov.uk/Notice/31332"
     },
     {
       "id": "ocds-h6vhtk-06ae3b",
@@ -605,7 +561,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06ae3b"
+      "url": "https://www.find-tender.service.gov.uk/Notice/30208"
     },
     {
       "id": "ocds-h6vhtk-06ae14",
@@ -616,7 +572,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06ae14"
+      "url": "https://www.find-tender.service.gov.uk/Notice/451642"
     },
     {
       "id": "ocds-h6vhtk-06adbb",
@@ -627,7 +583,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06adbb"
+      "url": "https://www.find-tender.service.gov.uk/Notice/26045"
     },
     {
       "id": "ocds-h6vhtk-06acc1",
@@ -638,7 +594,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06acc1"
+      "url": "https://www.find-tender.service.gov.uk/Notice/3168"
     },
     {
       "id": "ocds-h6vhtk-06ad58",
@@ -649,7 +605,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06ad58"
+      "url": "https://www.find-tender.service.gov.uk/Notice/60658"
     },
     {
       "id": "ocds-h6vhtk-06ad0f",
@@ -660,7 +616,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06ad0f"
+      "url": "https://www.find-tender.service.gov.uk/Notice/6060"
     },
     {
       "id": "ocds-h6vhtk-06ac87",
@@ -671,7 +627,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06ac87"
+      "url": "https://www.find-tender.service.gov.uk/Notice/60687"
     },
     {
       "id": "ocds-h6vhtk-06ad12",
@@ -682,7 +638,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06ad12"
+      "url": "https://www.find-tender.service.gov.uk/Notice/2649"
     },
     {
       "id": "ocds-h6vhtk-06ac81",
@@ -693,7 +649,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06ac81"
+      "url": "https://www.find-tender.service.gov.uk/Notice/32"
     },
     {
       "id": "ocds-h6vhtk-06ac74",
@@ -704,7 +660,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06ac74"
+      "url": "https://www.find-tender.service.gov.uk/Notice/26080"
     },
     {
       "id": "ocds-h6vhtk-06ac29",
@@ -715,7 +671,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06ac29"
+      "url": "https://www.find-tender.service.gov.uk/Notice/60629"
     },
     {
       "id": "ocds-h6vhtk-068a0b",
@@ -726,7 +682,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-15T12:00:00+01:00",
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/068a0b"
+      "url": "https://www.find-tender.service.gov.uk/Notice/60680"
     },
     {
       "id": "ocds-h6vhtk-06ac48",
@@ -737,7 +693,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06ac48"
+      "url": "https://www.find-tender.service.gov.uk/Notice/26075"
     },
     {
       "id": "ocds-h6vhtk-06ac0b",
@@ -748,7 +704,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06ac0b"
+      "url": "https://www.find-tender.service.gov.uk/Notice/4132006"
     },
     {
       "id": "ocds-h6vhtk-06abfd",
@@ -759,7 +715,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06abfd"
+      "url": "https://www.find-tender.service.gov.uk/Notice/0243"
     },
     {
       "id": "ocds-h6vhtk-06ab5f",
@@ -770,7 +726,7 @@
       "preEngagement": null,
       "questionDeadline": "2026-06-19T12:00:00+01:00",
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06ab5f"
+      "url": "https://www.find-tender.service.gov.uk/Notice/04436"
     },
     {
       "id": "ocds-h6vhtk-06abb2",
@@ -781,7 +737,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06abb2"
+      "url": "https://www.find-tender.service.gov.uk/"
     },
     {
       "id": "ocds-h6vhtk-069465",
@@ -792,7 +748,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/069465"
+      "url": "https://www.find-tender.service.gov.uk/Notice/2026965"
     },
     {
       "id": "ocds-h6vhtk-06ab9a",
@@ -803,7 +759,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06ab9a"
+      "url": "https://www.find-tender.service.gov.uk/Notice/817907"
     },
     {
       "id": "ocds-h6vhtk-06ab5a",
@@ -814,7 +770,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06ab5a"
+      "url": "https://www.find-tender.service.gov.uk/Notice/6065"
     },
     {
       "id": "ocds-h6vhtk-06a598",
@@ -825,7 +781,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06a598"
+      "url": "https://www.find-tender.service.gov.uk/Notice/606598"
     },
     {
       "id": "ocds-h6vhtk-058cf8",
@@ -836,7 +792,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/058cf8"
+      "url": "https://www.find-tender.service.gov.uk/Notice/60588"
     },
     {
       "id": "ocds-h6vhtk-069d5b",
@@ -847,7 +803,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/069d5b"
+      "url": "https://www.find-tender.service.gov.uk/Notice/60695"
     },
     {
       "id": "ocds-h6vhtk-06a91c",
@@ -858,62 +814,7 @@
       "preEngagement": null,
       "questionDeadline": null,
       "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06a91c"
-    },
-    {
-      "id": "ocds-h6vhtk-069298",
-      "source": "Find a Tender",
-      "title": "Branding Agency Services",
-      "buyer": "University of Greenwich",
-      "description": "The University of Greenwich is in the early stages of forming a multi University group. The Group is being established to formalise strategic collaboration between two universities, to strengthen regional impact in our London and South East England base, to improve operational efficiency, to enhance student experience and opportunities and to increase our combined influence at national and international levels. The University of Greenwich is looking to procure Branding Agency Services. The work includes developing a brand strategy, visual identity, brand architecture, accessibility-compliant d",
-      "preEngagement": null,
-      "questionDeadline": "2026-06-19T12:00:00+01:00",
-      "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/069298"
-    },
-    {
-      "id": "ocds-h6vhtk-06a5f0",
-      "source": "Find a Tender",
-      "title": "Leasing Round 6 (LR6) Digital Aerial Survey (DAS) Supplier - Preliminary Market Engagement",
-      "buyer": "The Crown Estate",
-      "description": "The Crown Estate (TCE) is undertaking preliminary market engagement in advance of a future procurement for a Digital Aerial Survey (DAS) supplier to support the Leasing Round 6 (LR6) Ecological Surveys Programme. The requirement is expected to include: A 24‑month offshore digital aerial survey campaign commencing March 2027 Monthly surveys across multiple Project Development Areas (PDAs) (including buffer) Data acquisition via aerial still imagery and/or digital video Identification and analysis of: Ornithology abundance and distribution Marine mammals and other megafauna abundance and distrib",
-      "preEngagement": null,
-      "questionDeadline": null,
-      "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06a5f0"
-    },
-    {
-      "id": "ocds-h6vhtk-06a23c",
-      "source": "Find a Tender",
-      "title": "GMCA 1982 - Safe Transitions - New Community Guidance",
-      "buyer": "Greater Manchester Combined Authority",
-      "description": "The Greater Manchester Combined Authority (GMCA) intends to commission the Safe Transitions: New Community Guidance Project, designed to improve access to information, strengthen integration outcomes and reduce the risk of homelessness among newly granted refugees and other migrant communities across Greater Manchester. Greater Manchester currently hosts over 8,500 people living in asylum support accommodation (June 2025). Evidence indicates that people with asylum backgrounds are disproportionately represented within homelessness and rough sleeping services, often due to limited understanding",
-      "preEngagement": null,
-      "questionDeadline": null,
-      "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06a23c"
-    },
-    {
-      "id": "ocds-h6vhtk-06a701",
-      "source": "Find a Tender",
-      "title": "Soft Market Testing Radiopharmacy Services Joint Venture",
-      "buyer": "Royal United Hospitals Bath NHS Foundation Trust",
-      "description": "The Royal United Hospitals NHS Foundation Trust is exploring options to expand its Radiopharmacy Services to improve access to diagnostics, innovative treatment and research in Southwest England. Uniquely positioned on the M4/M5 corridor, the Trust has a state-of-the-art Pharmacy build intended to provide a comprehensive range of services including: 1. Cytotoxics (191 sq ft): mainly production of systemic anticancer therapy (SACT) and clinical trials for Onc/Haem 2. Monoclonal antibodies (180 sq ft): products for Biologics unit and chemo unit 3. Radiopharmacy unit (279sq ft): supply for Nuclea",
-      "preEngagement": null,
-      "questionDeadline": null,
-      "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06a701"
-    },
-    {
-      "id": "ocds-h6vhtk-06a6f7",
-      "source": "Find a Tender",
-      "title": "Pre-market engagement - Provision of Electronic Tendering System",
-      "buyer": "COTTSWAY HOUSING ASSOCIATION LIMITED",
-      "description": "**Please note this is a pre-market engagement exercise** Cottsway has a contract in place for an e-tendering system, and the contract is due to expire in March 2027. The anticipated new contract period is 3 years, with an option to extend for up to 2 additional years. This pre-market engagement seeks to gather information from suppliers to assess market capability and inform the development of the procurement strategy, specification, and potential route to market, with any insights obtained used solely to shape our approach should we decide to proceed. For more information on this pre-market e",
-      "preEngagement": null,
-      "questionDeadline": null,
-      "submissionDeadline": null,
-      "url": "https://www.find-tender.service.gov.uk/Notice/06a6f7"
+      "url": "https://www.find-tender.service.gov.uk/Notice/2578"
     }
   ]
 }
