@@ -404,8 +404,7 @@ const sbClient = window.supabase.createClient(
 
 /* Load existing pipeline from Supabase on startup */
 async function loadPipeline(){
-  const { data, error } = await sbClient.from("pipeline").select("tender_id");
-  console.log("loadPipeline — data:", data, "error:", error);
+  const { data } = await sbClient.from("pipeline").select("tender_id");
   if(data) data.forEach(row => pipeline.add(row.tender_id));
   renderList();
   renderAgenda();
@@ -483,7 +482,7 @@ async function pursue(id){
   const { error } = await sbClient
     .from("pipeline")
     .insert({ tender_id: id, added_by: "team" });
-  console.log("pursue insert — id:", id, "error:", error);
+  if(error) console.warn("Pipeline save failed:", error.message);
   toast(`Added to pipeline: ${t?.buyer ?? id}`);
   renderList();
   renderAgenda();
