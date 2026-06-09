@@ -46,9 +46,19 @@ function isRelevant(title, desc, cpvList) {
 }
 
 /* ---- Keep only opportunities still open (deadline in the future) ---- */
-function stillOpen(submissionDeadline) {
-  if (!submissionDeadline) return true;            // keep if no deadline stated
-  return new Date(submissionDeadline) >= new Date();
+// Drop anything with a submission deadline more than 3 months in the past.
+// If no deadline is stated, only keep if published within the last 3 months.
+const THREE_MONTHS_AGO = new Date(Date.now() - 90 * 864e5);
+
+function stillOpen(submissionDeadline, publishedDate) {
+  if (submissionDeadline) {
+    return new Date(submissionDeadline) >= THREE_MONTHS_AGO;
+  }
+  if (publishedDate) {
+    return new Date(publishedDate) >= THREE_MONTHS_AGO;
+  }
+  // No deadline and no published date — drop to avoid ancient notices
+  return false;
 }
 
 /* ---- 1. FIND A TENDER ---- */
@@ -69,8 +79,14 @@ async function fetchFTS() {
       if (!isRelevant(t.title ?? "", t.description ?? "", cpv)) continue;
       if (!["active", "planning"].includes(t.status)) continue;
       const submissionDeadline = t.tenderPeriod?.endDate ?? null;
-      if (!stillOpen(submissionDeadline)) continue;
-      const noticeId = (pkg.ocid ?? "").replace("ocds-h6vhtk-", "");
+      const publishedDate = pkg.date ?? pkg.publishedDate ?? null;
+      if (!stillOpen(submissionDeadline, publishedDate)) continue;
+      // Use tender.id (the actual notice reference) for the URL if available,
+      // otherwise fall back to stripping the OCID prefix
+      const tenderId = t.id ?? "";
+      const noticeId = tenderId || (pkg.ocid ?? "").replace("ocds-h6vhtk-", "");
+      // FTS notice URLs use the numeric portion only
+      const numericId = noticeId.replace(/[^0-9]/g, "");
       out.push({
         id: pkg.ocid,
         source: "Find a Tender",
@@ -80,8 +96,8 @@ async function fetchFTS() {
         preEngagement: null,
         questionDeadline: t.enquiryPeriod?.endDate ?? null,
         submissionDeadline,
-        url: noticeId
-          ? `https://www.find-tender.service.gov.uk/Notice/${noticeId}`
+        url: numericId
+          ? `https://www.find-tender.service.gov.uk/Notice/${numericId}`
           : "https://www.find-tender.service.gov.uk/"
       });
     }
@@ -107,7 +123,8 @@ async function fetchCF() {
     const cpv = (t.items ?? []).map(i => i.classification?.id ?? "");
     if (!isRelevant(t.title ?? "", t.description ?? "", cpv)) continue;
     const submissionDeadline = t.tenderPeriod?.endDate ?? null;
-    if (!stillOpen(submissionDeadline)) continue;
+    const publishedDate = r.date ?? r.publishedDate ?? null;
+    if (!stillOpen(submissionDeadline, publishedDate)) continue;
     out.push({
       id: r.ocid ?? `cf-${out.length}`,
       source: "Contracts Finder",

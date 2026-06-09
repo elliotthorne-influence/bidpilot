@@ -303,13 +303,34 @@ function normalise(rec, i){
     id:    rec.id ?? rec.ocid ?? `t-${i}`,
     title, buyer,
     src:   rec.source ?? rec.src ?? "Find a Tender",
-    url:   rec.url ?? "#",
+    url:   portalUrl(rec),
     disc:  Array.isArray(rec.disc) ? rec.disc : deriveDisciplines(`${title} ${syn}`),
     stage,
     syn:   syn.length > 600 ? syn.slice(0,597) + "…" : syn,
     pre, q, s,
     accent: rec.accent ?? STAGE_ACCENT[stage] ?? "--blue"
   };
+}
+
+/* Build a reliable portal URL — use the API-provided URL if it looks like a real
+   notice page, otherwise fall back to a pre-filled search on the right portal.    */
+function portalUrl(rec) {
+  const raw = rec.url ?? "";
+  const title = rec.title ?? "";
+  const src = rec.source ?? rec.src ?? "";
+
+  // A real notice URL contains /Notice/ or /notice/ or has a long path
+  const looksReal = raw.includes("/Notice/") || raw.includes("/notice/") ||
+                    (raw.includes("contractsfinder") && raw.includes("/Published/Notice/"));
+
+  if (looksReal) return raw;
+
+  // Fall back to a pre-filled search on the right portal
+  const encoded = encodeURIComponent(title);
+  if (src === "Contracts Finder" || raw.includes("contractsfinder")) {
+    return `https://www.contractsfinder.service.gov.uk/Search/Results?keyword=${encoded}`;
+  }
+  return `https://www.find-tender.service.gov.uk/Search/Results?searchTerms=${encoded}`;
 }
 
 /* Load the feed, normalise, render. Falls back to the bundled sample.  */
