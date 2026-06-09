@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BidPilot — Influence Digital</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --black:#000;--white:#fff;--red:#dd3248;--green:#8cc664;--blue:#7299f4;
+    --yellow:#ffdd4e;--lilac:#dfaafd;--pink:#ffbdce;--lime:#bff45d;--cyan:#8fdff0;
+    --softyellow:#fae588;--greylilac:#ded7e4;--ink:#111;--muted:#6b6b6b;
+    --line:#e6e6e6;--bg:#fafafa;
+    --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',-apple-system,Helvetica,Arial,sans-serif;
+    --focus:#7299f4;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--sans);background:var(--bg);color:var(--ink);font-weight:300;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  a{color:inherit;}
+  :focus-visible{outline:2px solid var(--focus);outline-offset:2px;}
+
+  header{background:var(--black);color:#fff;padding:18px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;flex-wrap:wrap;gap:14px;}
+  .logo{display:flex;align-items:center;gap:18px;}
+  .brand{font-family:var(--mono);font-size:12px;letter-spacing:3px;line-height:1.3;text-transform:uppercase;}
+  .arrow{display:inline-flex;align-items:center;}
+  .arrow .line{width:54px;height:1px;background:#fff;}
+  .arrow .head{font-size:13px;margin-left:-4px;}
+  .app-name{font-family:var(--mono);font-size:20px;letter-spacing:1px;font-weight:500;}
+  .app-name b{font-weight:600;}
+  .topnav{display:flex;gap:6px;}
+  .topnav button{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#999;background:none;border:1px solid #333;padding:8px 16px;cursor:pointer;transition:.2s;}
+  .topnav button:hover{color:#fff;border-color:#666;}
+  .topnav button[aria-selected="true"]{color:#000;background:var(--lime);border-color:var(--lime);}
+
+  .wrap{max-width:1400px;margin:0 auto;padding:32px;}
+  .pagehead{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:1px solid var(--black);padding-bottom:18px;margin-bottom:28px;flex-wrap:wrap;gap:10px;}
+  h1{font-family:var(--mono);font-weight:500;font-size:36px;letter-spacing:-1px;line-height:1;}
+  .sub{font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+
+  /* ---- DETAILED LIST VIEW (retained as-is) ---- */
+  .tenders{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:18px;}
+  .card{background:#fff;border:1px solid var(--line);padding:22px;display:flex;flex-direction:column;transition:.2s;position:relative;overflow:hidden;}
+  .card:hover{border-color:var(--black);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.07);}
+  .accentbar{position:absolute;top:0;left:0;width:100%;height:4px;}
+  .toprow{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px;}
+  .src{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);padding:3px 7px;}
+  .stagepill{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:4px 9px;font-weight:500;}
+  .stage-pre{background:var(--lilac);}.stage-live{background:var(--cyan);}.stage-q{background:var(--blue);color:#fff;}.stage-deadline{background:var(--red);color:#fff;}
+  .card h3{font-family:var(--sans);font-weight:500;font-size:18px;line-height:1.25;margin-bottom:6px;}
+  .buyer{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.5px;margin-bottom:14px;}
+  .synopsis{font-size:13.5px;color:#333;line-height:1.55;margin-bottom:14px;flex:1;}
+  .synopsis .ai{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--blue);display:block;margin-bottom:5px;}
+  .tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:16px;}
+  .tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.5px;text-transform:uppercase;padding:3px 8px;background:var(--greylilac);color:#333;}
+  .dates{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;font-family:var(--mono);}
+  .date{border-left:2px solid var(--line);padding-left:9px;}
+  .date .k{font-size:8.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);}
+  .date .v{font-size:13px;font-weight:500;margin-top:2px;}
+  .date.urgent{border-left-color:var(--red);}.date.urgent .v{color:var(--red);}
+  .cardfoot{display:flex;gap:8px;}
+  .btn{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;padding:10px 14px;border:1px solid var(--black);background:#fff;cursor:pointer;transition:.15s;text-decoration:none;color:#000;display:inline-flex;align-items:center;justify-content:center;gap:6px;}
+  .btn:hover{background:#f0f0f0;}
+  .btn.primary{background:var(--black);color:#fff;flex:1;}
+  .btn.primary:hover{background:var(--blue);border-color:var(--blue);}
+  .btn.added{background:var(--green);border-color:var(--green);color:#000;cursor:default;}
+  .btn.portal{flex:0 0 auto;}
+  .btn.portal:hover{background:var(--yellow);border-color:var(--yellow);}
+
+  .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;align-items:center;}
+  .chip{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;padding:7px 14px;border:1px solid var(--black);background:#fff;cursor:pointer;transition:.15s;user-select:none;}
+  .chip:hover{background:#f0f0f0;}.chip[aria-pressed="true"]{background:var(--black);color:#fff;}
+  .search{flex:1;min-width:220px;font-family:var(--mono);font-size:12px;padding:8px 14px;border:1px solid var(--black);background:#fff;}
+
+  /* ---- CALENDAR (agenda) ---- */
+  .calhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;}
+  .calhead .mo{font-family:var(--mono);font-size:22px;letter-spacing:1px;}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;}
+  .legend span{display:flex;align-items:center;gap:6px;}
+  .legend i{width:11px;height:11px;display:inline-block;border-radius:1px;}
+  .agenda{display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line);}
+  .agenda-row{background:#fff;display:grid;grid-template-columns:120px 1fr;align-items:stretch;}
+  .agenda-row:hover{background:#fcfcfc;}
+  .ag-date{font-family:var(--mono);padding:16px 18px;border-right:3px solid var(--line);}
+  .ag-date.urgent{border-right-color:var(--red);}
+  .ag-date .d{font-size:26px;font-weight:500;line-height:1;}
+  .ag-date .md{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-top:4px;}
+  .ag-date .dd{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-top:8px;}
+  .ag-date .countdown{font-size:9px;letter-spacing:.5px;text-transform:uppercase;margin-top:6px;font-weight:500;}
+  .ag-events{display:flex;flex-direction:column;gap:8px;padding:14px 18px;min-width:0;}
+
+  /* event chip: name + type icon; truncates gracefully */
+  .ag-event{border:1px solid var(--line);}
+  .ag-event__head{display:flex;align-items:center;gap:12px;padding:10px 14px;min-width:0;}
+  .ag-event__icon{flex:0 0 auto;width:30px;height:30px;border:none;border-radius:2px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;line-height:1;padding:0;transition:.15s;}
+  .ag-event__icon:hover{filter:brightness(.92);}
+  .ag-event__icon[aria-expanded="true"]{box-shadow:0 0 0 2px var(--black) inset;}
+  .icon-pre{background:var(--lilac);}.icon-live{background:var(--cyan);}.icon-q{background:var(--blue);color:#fff;}.icon-deadline{background:var(--red);color:#fff;}
+  .ag-event__body{flex:1;min-width:0;}
+  .ag-event__name{font-family:var(--sans);font-weight:500;font-size:15px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ag-event__role{font-family:var(--mono);font-size:10px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  /* when collapsed-due-to-length: role hidden, only name + icon show */
+  .ag-event.is-truncated .ag-event__role{display:none;}
+  .ag-event__stage{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);flex:0 0 auto;}
+
+  /* accordion expansion */
+  .ag-event__detail{display:none;border-top:1px dashed var(--line);padding:14px 14px 16px 56px;}
+  .ag-event.is-open .ag-event__detail{display:block;}
+  .ag-event__detail dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-family:var(--mono);font-size:11px;}
+  .ag-event__detail dt{color:var(--muted);letter-spacing:.5px;text-transform:uppercase;}
+  .ag-event__detail dd{color:var(--ink);}
+  .ag-event__detail .syn{font-family:var(--sans);font-size:13px;line-height:1.55;color:#333;margin:12px 0 14px;}
+  .ag-event__detail .portal{display:inline-flex;}
+
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+  @media(max-width:900px){.twocol{grid-template-columns:1fr;}.agenda-row{grid-template-columns:90px 1fr;}.ag-event__detail{padding-left:14px;}}
+  .panel{background:#fff;border:1px solid var(--line);padding:26px;}
+  .panel h2{font-family:var(--mono);font-size:15px;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
+  .panel .pdesc{font-size:13px;color:var(--muted);margin-bottom:20px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+  .field input,.field select{width:100%;font-family:var(--sans);font-size:14px;padding:9px 11px;border:1px solid var(--line);background:#fafafa;}
+  .field input:focus,.field select:focus{outline:none;border-color:var(--blue);}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .logbtn{width:100%;font-family:var(--mono);font-size:12px;letter-spacing:1px;text-transform:uppercase;padding:13px;border:none;background:var(--black);color:#fff;cursor:pointer;margin-top:6px;}
+  .logbtn:hover{background:var(--blue);}
+  .record{border-left:3px solid var(--green);padding:10px 14px;margin-bottom:10px;background:#fafafa;}
+  .record.lost{border-left-color:var(--red);}
+  .record .rt{font-size:14px;font-weight:500;}
+  .record .rm{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.5px;margin-top:3px;text-transform:uppercase;}
+  .outcome{font-family:var(--mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:2px 7px;float:right;}
+  .outcome.won{background:var(--green);}.outcome.lost{background:var(--pink);}
+
+  .view[hidden]{display:none;}
+  .empty-note{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center;padding:40px;letter-spacing:1px;text-transform:uppercase;}
+  footer{font-family:var(--mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);text-align:center;padding:30px;border-top:1px solid var(--line);margin-top:40px;}
+  .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--black);color:#fff;font-family:var(--mono);font-size:12px;letter-spacing:1px;padding:14px 26px;opacity:0;transition:.3s;z-index:100;}
+  .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;}
+  .realnote{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);background:var(--softyellow);display:inline-block;padding:5px 10px;margin-bottom:20px;}
+  .realnote[data-state="loading"]{background:var(--greylilac);}
+  .realnote[data-state="ok"]{background:var(--lime);}
+  .realnote[data-state="error"]{background:var(--pink);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="brand">Influence<br>Digital</div>
+    <span class="arrow" aria-hidden="true"><span class="line"></span><span class="head">&#10142;</span></span>
+    <span class="app-name">BID<b>PILOT</b></span>
+  </div>
+  <nav class="topnav" role="tablist" aria-label="Views">
+    <button role="tab" aria-selected="true" aria-controls="discover" id="tab-discover" data-view="discover">Discover</button>
+    <button role="tab" aria-selected="false" aria-controls="calendar" id="tab-calendar" data-view="calendar">Pipeline Calendar</button>
+    <button role="tab" aria-selected="false" aria-controls="winrate" id="tab-winrate" data-view="winrate">Win Intelligence</button>
+  </nav>
+</header>
+
+<div class="wrap">
+
+  <!-- DETAILED LIST VIEW (retained) -->
+  <section class="view" id="discover" role="tabpanel" aria-labelledby="tab-discover">
+    <div class="pagehead">
+      <h1>Live Opportunities</h1>
+      <div class="sub">Find a Tender &middot; Contracts Finder &middot; <span id="synctime"></span></div>
+    </div>
+    <div class="realnote" id="feedNote" data-state="loading">&#9670; Connecting to live feed…</div>
+
+    <div class="filters" role="group" aria-label="Filter by discipline">
+      <input class="search" id="search" type="search" placeholder="search title, buyer, scope…" aria-label="Search opportunities">
+      <button class="chip" aria-pressed="true" data-f="all">All</button>
+      <button class="chip" aria-pressed="false" data-f="Strategy">Strategy</button>
+      <button class="chip" aria-pressed="false" data-f="Social">Social</button>
+      <button class="chip" aria-pressed="false" data-f="Paid Media">Paid Media</button>
+      <button class="chip" aria-pressed="false" data-f="Creative">Creative</button>
+      <button class="chip" aria-pressed="false" data-f="Research">Research</button>
+      <button class="chip" aria-pressed="false" data-f="Production">Production</button>
+    </div>
+
+    <div class="tenders" id="tenderGrid"></div>
+  </section>
+
+  <!-- CALENDAR -->
+  <section class="view" id="calendar" role="tabpanel" aria-labelledby="tab-calendar" hidden>
+    <div class="pagehead">
+      <h1>Pipeline Calendar</h1>
+      <div class="sub">Chronological agenda &middot; buyer name + stage</div>
+    </div>
+    <div class="calhead">
+      <div class="mo">UPCOMING KEY DATES</div>
+      <div class="legend" aria-hidden="true">
+        <span><i class="icon-pre"></i>Pre-engagement</span>
+        <span><i class="icon-live"></i>Live tender</span>
+        <span><i class="icon-q"></i>Questions deadline</span>
+        <span><i class="icon-deadline"></i>Submission deadline</span>
+      </div>
+    </div>
+    <div class="agenda" id="agenda"></div>
+  </section>
+
+  <!-- WIN INTELLIGENCE (percentage removed) -->
+  <section class="view" id="winrate" role="tabpanel" aria-labelledby="tab-winrate" hidden>
+    <div class="pagehead">
+      <h1>Win Intelligence</h1>
+      <div class="sub">Log past bids &middot; build the shared record</div>
+    </div>
+    <div class="twocol">
+      <div class="panel">
+        <h2>Log a past bid</h2>
+        <p class="pdesc">Each record builds the shared bid history used to assess future fit.</p>
+        <div class="field"><label for="fTitle">Tender / client</label><input id="fTitle" placeholder="e.g. NMRN — Creative Campaign"></div>
+        <div class="row2">
+          <div class="field"><label for="fBuyer">Buyer type</label>
+            <select id="fBuyer"><option>Museum / Heritage</option><option>Arts org / Charity</option><option>Central gov</option><option>Local authority</option><option>NHS / Health</option><option>Other public</option></select></div>
+          <div class="field"><label for="fDisc">Discipline</label>
+            <select id="fDisc"><option>Strategy</option><option>Social</option><option>Paid Media</option><option>Creative</option><option>Research</option><option>Production</option></select></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label for="fValue">Value band</label>
+            <select id="fValue"><option>&lt; £50k</option><option>£50k–£150k</option><option>£150k–£500k</option><option>£500k+</option></select></div>
+          <div class="field"><label for="fOutcome">Outcome</label>
+            <select id="fOutcome"><option>Won</option><option>Lost</option></select></div>
+        </div>
+        <button class="logbtn" id="logBtn" type="button">+ Log bid record</button>
+      </div>
+      <div class="panel">
+        <h2>Your bid history</h2>
+        <p class="pdesc"><span id="recCount">0</span> logged bids &middot; <span id="wonCount">0</span> won.</p>
+        <div id="records"></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Influence Digital &middot; BidPilot &middot; opportunities are real notices from Find a Tender &amp; Contracts Finder</footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+
+/* ------------------------------------------------------------------ *
+ *  Live data is loaded at runtime from tenders.json, which is produced
+ *  by the scheduled fetch-tenders job (Find a Tender + Contracts Finder
+ *  OCDS APIs). TENDERS is therefore mutable and starts empty.
+ *  FALLBACK below is a tiny bundled sample so the file still renders if
+ *  tenders.json is absent (e.g. opened directly from disk with no feed).
+ * ------------------------------------------------------------------ */
+let TENDERS = [];
+
+const FALLBACK = [
+  {id:"sample-1",title:"Sample — connect tenders.json to see live data",buyer:"Find a Tender / Contracts Finder",src:"Sample",
+   url:"https://www.find-tender.service.gov.uk/",
+   disc:["Strategy"],stage:"live",
+   syn:"This is bundled placeholder data shown because tenders.json could not be loaded. Run the fetch-tenders job and serve this file over HTTP to populate real, current opportunities.",
+   pre:null,q:null,s:null,accent:"--greylilac"}
+];
+
+/* ------------------------------------------------------------------ *
+ *  Discipline tagging + accent colour are derived client-side from the
+ *  notice text/CPV so the feed file can stay close to raw OCDS output.
+ * ------------------------------------------------------------------ */
+const DISCIPLINE_RULES = [
+  ["Strategy",   ["strateg","brand","planning","consult","insight direction"]],
+  ["Social",     ["social media","social","tiktok","instagram","community management"]],
+  ["Paid Media", ["paid media","media buying","media planning","programmatic","ppc","paid search","advertising"]],
+  ["Creative",   ["creative","design","content","campaign","film","video","artwork"]],
+  ["Research",   ["research","insight","evaluation","segmentation","audience","survey"]],
+  ["Production", ["production","film","video","photography","audio","print"]]
+];
+const STAGE_ACCENT = {pre:"--lilac",live:"--cyan",q:"--blue",deadline:"--red"};
+
+function deriveDisciplines(text){
+  const t = (text || "").toLowerCase();
+  const hits = DISCIPLINE_RULES.filter(([,kw]) => kw.some(k => t.includes(k))).map(([d]) => d);
+  return hits.length ? Array.from(new Set(hits)) : ["Strategy"];
+}
+
+/* Map one record from tenders.json (OCDS-shaped) into the UI shape.   *
+ * Accepts either the slim fields the fetch script writes, or close     *
+ * variants, so minor feed changes don't break the UI.                  */
+function normalise(rec, i){
+  const title = rec.title ?? rec.tender?.title ?? "Untitled notice";
+  const buyer = rec.buyer ?? rec.tender?.buyer ?? "";
+  const syn   = rec.description ?? rec.synopsis ?? rec.syn ?? "";
+  const q     = rec.questionDeadline   ?? rec.q ?? null;
+  const s     = rec.submissionDeadline ?? rec.s ?? null;
+  const pre   = rec.preEngagement ?? rec.pre ?? null;
+
+  // Derive the dominant stage from which dates exist / are still ahead.
+  let stage = rec.stage;
+  if(!stage){
+    if(pre && daysTo(pre) >= 0) stage = "pre";
+    else if(s && daysTo(s) >= 0 && daysTo(s) <= 7) stage = "deadline";
+    else if(q && daysTo(q) >= 0) stage = "q";
+    else stage = "live";
+  }
+
+  return {
+    id:    rec.id ?? rec.ocid ?? `t-${i}`,
+    title, buyer,
+    src:   rec.source ?? rec.src ?? "Find a Tender",
+    url:   rec.url ?? "#",
+    disc:  Array.isArray(rec.disc) ? rec.disc : deriveDisciplines(`${title} ${syn}`),
+    stage,
+    syn:   syn.length > 600 ? syn.slice(0,597) + "…" : syn,
+    pre, q, s,
+    accent: rec.accent ?? STAGE_ACCENT[stage] ?? "--blue"
+  };
+}
+
+/* Load the feed, normalise, render. Falls back to the bundled sample.  */
+async function loadTenders(){
+  showFeedState("loading");
+  try{
+    const res = await fetch("tenders.json", {cache:"no-store"});
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const raw = await res.json();
+    const rows = Array.isArray(raw) ? raw : (raw.tenders ?? raw.results ?? []);
+    if(!rows.length) throw new Error("empty feed");
+    TENDERS = rows.map(normalise);
+    showFeedState("ok", {count:TENDERS.length, generatedAt:raw.generatedAt});
+  }catch(err){
+    TENDERS = FALLBACK.map(normalise);
+    showFeedState("error", {message:err.message});
+  }
+  renderList();
+  renderAgenda();
+}
+
+/* Surface feed status in the Discover sub-header + banner.             */
+function showFeedState(state, info = {}){
+  const sync = $("#synctime");
+  const note = $("#feedNote");
+  if(state === "loading"){
+    if(sync) sync.textContent = "loading live feed…";
+    if(note){ note.textContent = "◆ Fetching live notices from Find a Tender & Contracts Finder…"; note.dataset.state = "loading"; }
+    if(grid) grid.innerHTML = '<div class="empty-note">Loading opportunities…</div>';
+  }
+  if(state === "ok"){
+    const when = info.generatedAt ? new Date(info.generatedAt) : new Date();
+    if(sync) sync.textContent = "feed updated " + when.toLocaleString("en-GB",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});
+    if(note){ note.textContent = `◆ ${info.count} live opportunities from Find a Tender & Contracts Finder — every card links to its source`; note.dataset.state = "ok"; }
+  }
+  if(state === "error"){
+    if(sync) sync.textContent = "live feed unavailable";
+    if(note){ note.textContent = `◆ Could not load tenders.json (${info.message}). Showing sample data — run the fetch job and serve over HTTP for live notices.`; note.dataset.state = "error"; }
+  }
+}
+
+const STAGE = {
+  pre:     {label:"Pre-engagement",    pill:"stage-pre",     icon:"icon-pre",     glyph:"\u25C8", aria:"Pre-engagement"},
+  live:    {label:"Live tender",       pill:"stage-live",    icon:"icon-live",    glyph:"\u25CF", aria:"Live tender"},
+  q:       {label:"Questions deadline",pill:"stage-q",       icon:"icon-q",       glyph:"?",      aria:"Questions deadline"},
+  deadline:{label:"Submission deadline",pill:"stage-deadline",icon:"icon-deadline",glyph:"\u2691", aria:"Submission deadline"}
+};
+
+/* Use the start of the real current day so countdowns are accurate. */
+const TODAY = (() => { const d = new Date(); d.setHours(0,0,0,0); return d; })();
+
+/* ---- app state ---- */
+const pipeline = new Set();
+const records  = [];
+let activeFilter = "all";
+let searchTerm   = "";
+
+/* ---- small DOM helpers ---- */
+const $  = (sel, root=document) => root.querySelector(sel);
+const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+const esc = (str="") => str.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const parseDate = iso => new Date(iso + "T00:00:00");
+const fmtShort = iso => iso ? parseDate(iso).toLocaleDateString("en-GB",{day:"2-digit",month:"short"}) : "—";
+const fmtLong  = iso => iso ? parseDate(iso).toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"}) : "—";
+const daysTo   = iso => Math.ceil((parseDate(iso) - TODAY) / 86400000);
+
+/* =========================================================
+ *  DETAILED LIST VIEW (retained — order & structure unchanged)
+ * ========================================================= */
+const grid = $("#tenderGrid");
+
+function renderList(){
+  const list = TENDERS.filter(t => {
+    const okFilter = activeFilter === "all" || t.disc.includes(activeFilter);
+    const okSearch = !searchTerm || (t.title + t.buyer + t.syn).toLowerCase().includes(searchTerm);
+    return okFilter && okSearch;
+  });
+
+  if(!list.length){ grid.innerHTML = '<div class="empty-note">No matching opportunities</div>'; return; }
+
+  grid.innerHTML = list.map(t => {
+    const added = pipeline.has(t.id);
+    const subDays = t.s ? daysTo(t.s) : Infinity;
+    const st = STAGE[t.stage];
+    return `
+      <article class="card">
+        <div class="accentbar" style="background:var(${t.accent})"></div>
+        <div class="toprow">
+          <span class="src">${esc(t.src)}</span>
+          <span class="stagepill ${st.pill}">${st.label}</span>
+        </div>
+        <h3>${esc(t.title)}</h3>
+        <div class="buyer">${esc(t.buyer)}</div>
+        <div class="synopsis"><span class="ai">&#9670; AI Synopsis</span>${esc(t.syn)}</div>
+        <div class="tags">${t.disc.map(d => `<span class="tag">${esc(d)}</span>`).join("")}</div>
+        <div class="dates">
+          ${t.pre ? `<div class="date"><div class="k">Pre-engage</div><div class="v">${fmtShort(t.pre)}</div></div>` : ""}
+          ${t.q   ? `<div class="date"><div class="k">Questions</div><div class="v">${fmtShort(t.q)}</div></div>` : ""}
+          ${t.s   ? `<div class="date ${subDays < 14 ? "urgent" : ""}"><div class="k">Submission</div><div class="v">${fmtShort(t.s)}</div></div>` : ""}
+        </div>
+        <div class="cardfoot">
+          <button class="btn primary js-pursue ${added ? "added" : ""}" data-id="${esc(String(t.id))}" ${added ? "disabled" : ""}>
+            ${added ? "&#10003; In pipeline" : "Pursue &#10142;"}
+          </button>
+          <a class="btn portal" href="${esc(t.url)}" target="_blank" rel="noopener noreferrer"
+             aria-label="View ${esc(t.buyer)} notice on ${esc(t.src)} (opens in new tab)">View on portal &#8599;</a>
+        </div>
+      </article>`;
+  }).join("");
+}
+
+/* event delegation for pursue buttons */
+grid.addEventListener("click", e => {
+  const btn = e.target.closest(".js-pursue");
+  if(!btn) return;
+  pursue(btn.dataset.id);
+});
+
+function pursue(id){
+  if(pipeline.has(id)) return;
+  pipeline.add(id);
+  const t = TENDERS.find(x => x.id === id);
+  toast(`Added to pipeline: ${t.buyer}`);
+  renderList();
+  renderAgenda();
+}
+
+/* filters */
+$$(".chip").forEach(chip => chip.addEventListener("click", () => {
+  $$(".chip").forEach(c => c.setAttribute("aria-pressed","false"));
+  chip.setAttribute("aria-pressed","true");
+  activeFilter = chip.dataset.f;
+  renderList();
+}));
+$("#search").addEventListener("input", e => { searchTerm = e.target.value.toLowerCase(); renderList(); });
+
+/* =========================================================
+ *  CALENDAR VIEW
+ *  Each key date → an event chip showing NAME + TYPE ICON.
+ *  When the row text is too long to fit, the secondary line
+ *  (role/title) is hidden so only name + icon remain; the icon
+ *  toggles an accordion with the full explanation.
+ * ========================================================= */
+const agenda = $("#agenda");
+
+function buildEvents(){
+  const events = [];
+  TENDERS.filter(t => pipeline.has(t.id)).forEach(t => {
+    if(t.pre) events.push({ date:t.pre, stage:"pre", t });
+    if(t.q)   events.push({ date:t.q,   stage:"q",   t });
+    if(t.s)   events.push({ date:t.s,   stage:"deadline", t });
+    if(t.stage === "live"){
+      const anchor = t.pre || t.q || t.s;
+      if(anchor) events.push({ date:anchor, stage:"live", t });
+    }
+  });
+  return events.sort((a,b) => parseDate(a.date) - parseDate(b.date));
+}
+
+function eventChip(ev, key){
+  const st = STAGE[ev.stage];
+  const t  = ev.t;
+  const panelId = `evp-${key}`;
+  const btnId   = `evb-${key}`;
+  return `
+    <div class="ag-event" data-event="${key}">
+      <div class="ag-event__head">
+        <button class="ag-event__icon ${st.icon}" id="${btnId}"
+                type="button" aria-expanded="false" aria-controls="${panelId}"
+                title="${st.aria} — show details">
+          <span aria-hidden="true">${st.glyph}</span>
+          <span class="sr-only">${st.aria}. Show full details.</span>
+        </button>
+        <div class="ag-event__body">
+          <div class="ag-event__name" title="${esc(t.buyer)}">${esc(t.buyer)}</div>
+          <div class="ag-event__role">${st.label} &middot; ${esc(t.title)}</div>
+        </div>
+        <span class="ag-event__stage">${st.label}</span>
+      </div>
+      <div class="ag-event__detail" id="${panelId}" role="region" aria-labelledby="${btnId}" hidden>
+        <dl>
+          <dt>Stage</dt><dd>${st.label}</dd>
+          <dt>Date</dt><dd>${fmtLong(ev.date)}</dd>
+          <dt>Buyer</dt><dd>${esc(t.buyer)}</dd>
+          <dt>Opportunity</dt><dd>${esc(t.title)}</dd>
+          <dt>Source</dt><dd>${esc(t.src)}</dd>
+        </dl>
+        <p class="syn">${esc(t.syn)}</p>
+        <a class="btn portal" href="${esc(t.url)}" target="_blank" rel="noopener noreferrer"
+           aria-label="View ${esc(t.buyer)} notice on ${esc(t.src)} (opens in new tab)">View on portal &#8599;</a>
+      </div>
+    </div>`;
+}
+
+function renderAgenda(){
+  const events = buildEvents();
+  if(!events.length){
+    agenda.innerHTML = '<div class="empty-note">Pursue an opportunity to populate the calendar</div>';
+    return;
+  }
+
+  /* group by date */
+  const byDate = new Map();
+  events.forEach(ev => {
+    if(!byDate.has(ev.date)) byDate.set(ev.date, []);
+    byDate.get(ev.date).push(ev);
+  });
+
+  let key = 0;
+  const rows = Array.from(byDate.keys())
+    .sort((a,b) => parseDate(a) - parseDate(b))
+    .map(date => {
+      const dt = parseDate(date);
+      const dleft = daysTo(date);
+      const urgent = dleft >= 0 && dleft <= 10;
+      const cd = dleft < 0 ? "Passed" : dleft === 0 ? "Today" : `${dleft} day${dleft === 1 ? "" : "s"} away`;
+      const cdColor = urgent ? "var(--red)" : dleft < 0 ? "var(--muted)" : "var(--green)";
+      const chips = byDate.get(date).map(ev => eventChip(ev, key++)).join("");
+      return `
+        <div class="agenda-row">
+          <div class="ag-date ${urgent ? "urgent" : ""}">
+            <div class="d">${dt.getDate()}</div>
+            <div class="md">${dt.toLocaleDateString("en-GB",{month:"short"})}</div>
+            <div class="dd">${dt.toLocaleDateString("en-GB",{weekday:"short"})}</div>
+            <div class="countdown" style="color:${cdColor}">${cd}</div>
+          </div>
+          <div class="ag-events">${chips}</div>
+        </div>`;
+    }).join("");
+
+  agenda.innerHTML = rows;
+  requestAnimationFrame(flagTruncatedEvents);
+}
+
+/* Detect chips whose name line overflows; collapse to name + icon only. */
+function flagTruncatedEvents(){
+  $$(".ag-event", agenda).forEach(chip => {
+    if(chip.classList.contains("is-open")) return; // never collapse an open row
+    const name = $(".ag-event__name", chip);
+    const truncated = name.scrollWidth > name.clientWidth + 1;
+    chip.classList.toggle("is-truncated", truncated);
+  });
+}
+
+/* accordion toggle (event delegation) */
+agenda.addEventListener("click", e => {
+  const icon = e.target.closest(".ag-event__icon");
+  if(!icon) return;
+  const chip   = icon.closest(".ag-event");
+  const panel  = $("#" + icon.getAttribute("aria-controls"));
+  const isOpen = chip.classList.toggle("is-open");
+  icon.setAttribute("aria-expanded", String(isOpen));
+  if(isOpen){
+    panel.hidden = false;
+    chip.classList.remove("is-truncated"); // show full text while expanded
+  } else {
+    panel.hidden = true;
+    flagTruncatedEvents();
+  }
+});
+
+/* re-evaluate truncation on resize (debounced) */
+let resizeTimer;
+window.addEventListener("resize", () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(flagTruncatedEvents, 150);
+});
+
+/* =========================================================
+ *  WIN INTELLIGENCE (no percentage)
+ * ========================================================= */
+$("#logBtn").addEventListener("click", () => {
+  const rec = {
+    title:  $("#fTitle").value.trim() || "Untitled bid",
+    buyer:  $("#fBuyer").value,
+    disc:   $("#fDisc").value,
+    value:  $("#fValue").value,
+    outcome:$("#fOutcome").value
+  };
+  records.unshift(rec);
+  $("#fTitle").value = "";
+  renderRecords();
+  toast("Bid record logged");
+});
+
+function renderRecords(){
+  $("#recCount").textContent = records.length;
+  $("#wonCount").textContent = records.filter(r => r.outcome === "Won").length;
+  const box = $("#records");
+  if(!records.length){ box.innerHTML = '<div class="empty-note">No records yet</div>'; return; }
+  box.innerHTML = records.map(r => `
+    <div class="record ${r.outcome === "Lost" ? "lost" : ""}">
+      <span class="outcome ${r.outcome.toLowerCase()}">${esc(r.outcome)}</span>
+      <div class="rt">${esc(r.title)}</div>
+      <div class="rm">${esc(r.buyer)} &middot; ${esc(r.disc)} &middot; ${esc(r.value)}</div>
+    </div>`).join("");
+}
+
+/* =========================================================
+ *  Tabs
+ * ========================================================= */
+$$('.topnav [role="tab"]').forEach(tab => tab.addEventListener("click", () => {
+  $$('.topnav [role="tab"]').forEach(t => t.setAttribute("aria-selected","false"));
+  tab.setAttribute("aria-selected","true");
+  $$(".view").forEach(v => { v.hidden = true; });
+  const view = $("#" + tab.dataset.view);
+  view.hidden = false;
+  if(tab.dataset.view === "calendar") requestAnimationFrame(flagTruncatedEvents);
+}));
+
+/* =========================================================
+ *  Toast
+ * ========================================================= */
+let toastTimer;
+function toast(msg){
+  const el = $("#toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove("show"), 2600);
+}
+
+/* =========================================================
+ *  Init — load live feed, then render. renderRecords is
+ *  independent of the feed so it runs immediately.
+ * ========================================================= */
+renderRecords();
+loadTenders();   // async: sets TENDERS from tenders.json, then renders list + agenda
+</script>
+</body>
+</html>

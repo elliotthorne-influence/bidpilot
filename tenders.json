@@ -1,0 +1,62 @@
+{
+  "generatedAt": "2026-06-08T22:38:05",
+  "count": 5,
+  "_note": "SAMPLE data in the shape fetch-tenders.js emits. Replace by running the real fetch job.",
+  "tenders": [
+    {
+      "id": "ocds-h6vhtk-SAMPLE1",
+      "source": "Find a Tender",
+      "title": "Integrated Marketing & Creative Agency Services",
+      "buyer": "National Museums Liverpool",
+      "description": "Multi-year appointment for integrated brand strategy, social media and paid media campaign delivery across the museum group. Research-led audience segmentation phase in year one. Social value weighting 10%.",
+      "preEngagement": null,
+      "questionDeadline": "2026-06-16",
+      "submissionDeadline": "2026-06-28",
+      "url": "https://www.find-tender.service.gov.uk/"
+    },
+    {
+      "id": "ocds-h6vhtk-SAMPLE2",
+      "source": "Find a Tender",
+      "title": "Creative & Advertising Agency \u2014 Visitor Campaign",
+      "buyer": "National Museum of the Royal Navy",
+      "description": "12-month creative campaign with option to extend, covering creative strategy, content production and paid media for a major heritage attraction. Preliminary market engagement session being held ahead of tender.",
+      "preEngagement": "2026-06-12",
+      "questionDeadline": "2026-06-22",
+      "submissionDeadline": "2026-07-03",
+      "url": "https://www.find-tender.service.gov.uk/"
+    },
+    {
+      "id": "ocds-h6vhtk-SAMPLE3",
+      "source": "Contracts Finder",
+      "title": "Audience Insight & Evaluation Research Partner",
+      "buyer": "Historic Royal Palaces",
+      "description": "Research partner for ongoing visitor segmentation, campaign evaluation and audience insight. Blend of quantitative and qualitative methods. Two-year term with annual review.",
+      "preEngagement": null,
+      "questionDeadline": "2026-06-19",
+      "submissionDeadline": "2026-07-06",
+      "url": "https://www.contractsfinder.service.gov.uk/"
+    },
+    {
+      "id": "ocds-h6vhtk-SAMPLE4",
+      "source": "Find a Tender",
+      "title": "Social Media & Short-Form Content Production",
+      "buyer": "Arts Council England",
+      "description": "Short-form social content production retainer focused on younger audiences across TikTok and Reels, with paid social amplification. 18-month term.",
+      "preEngagement": null,
+      "questionDeadline": "2026-06-11",
+      "submissionDeadline": "2026-06-20",
+      "url": "https://www.find-tender.service.gov.uk/"
+    },
+    {
+      "id": "ocds-h6vhtk-SAMPLE5",
+      "source": "Contracts Finder",
+      "title": "Digital Marketing Strategy & Campaign Delivery",
+      "buyer": "Amgueddfa Cymru \u2014 Museum Wales",
+      "description": "End-to-end digital marketing strategy and bilingual (Welsh/English) campaign delivery across multiple museum sites. Experience-led approach favoured.",
+      "preEngagement": "2026-06-20",
+      "questionDeadline": "2026-07-04",
+      "submissionDeadline": "2026-07-18",
+      "url": "https://www.contractsfinder.service.gov.uk/"
+    }
+  ]
+}
