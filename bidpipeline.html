@@ -375,7 +375,7 @@ function showFeedState(state, info = {}){
   if(state === "ok"){
     const when = info.generatedAt ? new Date(info.generatedAt) : new Date();
     if(sync) sync.textContent = "feed updated " + when.toLocaleString("en-GB",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});
-    if(note){ note.textContent = `◆ ${info.count} live opportunities from Find a Tender & Contracts Finder — every card links to its source`; note.dataset.state = "ok"; }
+    if(note){ note.textContent = `◆ ${info.count} live opportunities from Find a Tender & Contracts Finder — every card links to its source. If a link doesn't open, copy the opportunity name or URL into Google to find it.`; note.dataset.state = "ok"; }
   }
   if(state === "error"){
     if(sync) sync.textContent = "live feed unavailable";
