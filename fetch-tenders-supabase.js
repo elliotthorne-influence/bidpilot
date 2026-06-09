@@ -15,6 +15,7 @@
 //   Contracts Finder: https://www.contractsfinder.service.gov.uk/apidocumentation/home
 
 import { createClient } from "@supabase/supabase-js";
+import ws from "ws";
 
 /* ---- Supabase connection (from environment, never hard-coded) ---- */
 const SUPABASE_URL = process.env.SUPABASE_URL;
@@ -24,7 +25,8 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
   process.exit(1);
 }
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
-  auth: { persistSession: false }
+  auth: { persistSession: false },
+  realtime: { transport: ws }
 });
 
 /* ---- Filter: CPV codes that map to agency disciplines ---- */
