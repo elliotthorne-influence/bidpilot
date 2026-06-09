@@ -329,12 +329,15 @@ function portalUrl(rec) {
       : `https://www.contractsfinder.service.gov.uk/Search/Results?keyword=${encoded}`;
   }
 
-  // Find a Tender: always use pre-filled search — combine title + buyer
-  // for a specific enough query to find the right notice immediately
-  const buyer = rec.buyer ?? rec.src ?? "";
-  const query = buyer ? `${title} ${buyer}` : title;
-  const encodedQuery = encodeURIComponent(query);
-  return `https://www.find-tender.service.gov.uk/Search/Results?searchTerms=${encodedQuery}`;
+  // Find a Tender: derive the notice reference directly from the OCID
+  // e.g. ocds-h6vhtk-0692a0 → /Notice/0692a0
+  const ocid = rec.id ?? "";
+  const noticeRef = ocid.replace("ocds-h6vhtk-", "").trim();
+  if (noticeRef) {
+    return `https://www.find-tender.service.gov.uk/Notice/${noticeRef}`;
+  }
+  // Final fallback — search by title
+  return `https://www.find-tender.service.gov.uk/Search/Results?searchTerms=${encoded}`;
 }
 
 /* Load the feed, normalise, render. Falls back to the bundled sample.  */
