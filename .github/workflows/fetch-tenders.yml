@@ -2,8 +2,8 @@ name: Refresh BidPilot tenders
 
 on:
   schedule:
-    - cron: '0 */6 * * *'   # every 6 hours
-  workflow_dispatch:          # also allows manual "Run workflow" button
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
 
 jobs:
   fetch:
@@ -20,13 +20,11 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Fetch latest tenders
-        run: node fetch-tenders.js
+      - name: Install dependencies
+        run: npm install @supabase/supabase-js
 
-      - name: Commit updated tenders.json
-        run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add tenders.json
-          git diff --cached --quiet || git commit -m "chore: refresh tenders.json [skip ci]"
-          git push
+      - name: Fetch latest tenders
+        run: node fetch-tenders-supabase.js
+        env:
+          SUPABASE_URL:         ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
