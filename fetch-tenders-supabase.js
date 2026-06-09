@@ -75,7 +75,13 @@ async function fetchFTS() {
       if (!["active", "planning"].includes(t.status)) continue;
       const submissionDeadline = t.tenderPeriod?.endDate ?? null;
       if (!stillOpen(submissionDeadline)) continue;
-      const noticeId = (pkg.ocid ?? "").replace("ocds-h6vhtk-", "");
+      // Pull the real notice URL from the documents array first,
+      // then fall back to tender.id, then null
+      const docUrl = (t.documents ?? []).find(d => d.url?.includes("find-tender"))?.url ?? null;
+      const tenderId = t.id ?? "";
+      const ftsUrl = docUrl
+        ?? (tenderId ? `https://www.find-tender.service.gov.uk/Notice/${tenderId}` : null)
+        ?? "https://www.find-tender.service.gov.uk/";
       out.push({
         id: pkg.ocid,
         source: "Find a Tender",
@@ -85,9 +91,7 @@ async function fetchFTS() {
         pre_engagement: null,
         question_deadline: t.enquiryPeriod?.endDate ?? null,
         submission_deadline: submissionDeadline,
-        url: noticeId
-          ? `https://www.find-tender.service.gov.uk/Notice/${noticeId}`
-          : "https://www.find-tender.service.gov.uk/"
+        url: ftsUrl
       });
     }
     next = data.links?.next ?? null;
