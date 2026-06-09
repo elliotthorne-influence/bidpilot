@@ -318,13 +318,19 @@ function portalUrl(rec) {
   const raw = rec.url ?? "";
   const title = rec.title ?? "";
   const src = rec.source ?? rec.src ?? "";
+  const ocid = rec.id ?? "";
 
-  // If we have a real notice URL, use it
+  // If the stored URL looks like a real notice page, use it directly
   if (raw && raw !== "#" &&
       !raw.endsWith("find-tender.service.gov.uk/") &&
       !raw.endsWith("contractsfinder.service.gov.uk/")) {
     return raw;
   }
+
+  // If we have an OCID, try to extract the notice number from it
+  // tenders.json may have the correct URL but it might be stored in id field
+  // Real FTS notice numbers look like: 052705-2026
+  const ocidRef = ocid.replace("ocds-h6vhtk-", "").trim();
 
   // Fallback: pre-filled search
   const encoded = encodeURIComponent(title);
@@ -337,7 +343,7 @@ function portalUrl(rec) {
 async function loadTenders(){
   showFeedState("loading");
   try{
-    const res = await fetch("tenders.json", {cache:"no-store"});
+    const res = await fetch("tenders.json?v=" + Date.now(), {cache:"no-store"});
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
     const raw = await res.json();
     const rows = Array.isArray(raw) ? raw : (raw.tenders ?? raw.results ?? []);
