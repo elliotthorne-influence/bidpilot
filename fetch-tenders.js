@@ -81,12 +81,13 @@ async function fetchFTS() {
       const submissionDeadline = t.tenderPeriod?.endDate ?? null;
       const publishedDate = pkg.date ?? pkg.publishedDate ?? null;
       if (!stillOpen(submissionDeadline, publishedDate)) continue;
-      // Use tender.id (the actual notice reference) for the URL if available,
-      // otherwise fall back to stripping the OCID prefix
+      // Find the real notice URL from the documents array first,
+      // then try tender.id, then fall back to null (portalUrl in the HTML will handle it)
+      const docUrl = (t.documents ?? []).find(d => d.url?.includes("find-tender"))?.url ?? null;
       const tenderId = t.id ?? "";
-      const noticeId = tenderId || (pkg.ocid ?? "").replace("ocds-h6vhtk-", "");
-      // FTS notice URLs use the numeric portion only
-      const numericId = noticeId.replace(/[^0-9]/g, "");
+      // tender.id sometimes contains the real notice number e.g. "054201-2026"
+      const ftsUrl = docUrl
+        ?? (tenderId ? `https://www.find-tender.service.gov.uk/Notice/${tenderId}` : null);
       out.push({
         id: pkg.ocid,
         source: "Find a Tender",
@@ -96,9 +97,7 @@ async function fetchFTS() {
         preEngagement: null,
         questionDeadline: t.enquiryPeriod?.endDate ?? null,
         submissionDeadline,
-        url: numericId
-          ? `https://www.find-tender.service.gov.uk/Notice/${numericId}`
-          : "https://www.find-tender.service.gov.uk/"
+        url: ftsUrl ?? "https://www.find-tender.service.gov.uk/"
       });
     }
     next = data.links?.next ?? null;
