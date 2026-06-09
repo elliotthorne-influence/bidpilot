@@ -492,13 +492,6 @@ async function pursue(id){
   renderAgenda();
 }
 
-/* event delegation for remove buttons */
-agenda.addEventListener("click", e => {
-  const btn = e.target.closest(".js-remove");
-  if(!btn) return;
-  removeFromPipeline(btn.dataset.id);
-});
-
 async function removeFromPipeline(id){
   pipeline.delete(id);
   const { error } = await sbClient
@@ -527,6 +520,13 @@ $("#search").addEventListener("input", e => { searchTerm = e.target.value.toLowe
  *  toggles an accordion with the full explanation.
  * ========================================================= */
 const agenda = $("#agenda");
+
+/* event delegation for remove buttons */
+agenda.addEventListener("click", e => {
+  const btn = e.target.closest(".js-remove");
+  if(!btn) return;
+  removeFromPipeline(btn.dataset.id);
+});
 
 function buildEvents(){
   const events = [];
