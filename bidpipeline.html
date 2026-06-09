@@ -346,7 +346,7 @@ async function loadTenders(){
   try{
     const sb = window.supabase.createClient(
       "https://hoefxgoakftdwkpselmo.supabase.co",
-      "sb_publishable_EsZ9peq33J4eLRkPstcGtg_-WI3rTda"
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhvZWZ4Z29ha2Z0ZHdrcHNlbG1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMDQ4NDksImV4cCI6MjA5NjU4MDg0OX0.oX3UcS9s8OyArGT06Nne4pQEnWbsTnsJyp0l_EA9K8Y"
     );
     const { data, error } = await sb
       .from("tenders")
@@ -400,7 +400,7 @@ const pipeline = new Set();
 /* Supabase client for pipeline writes (same project, publishable key) */
 const sbClient = window.supabase.createClient(
   "https://hoefxgoakftdwkpselmo.supabase.co",
-  "sb_publishable_EsZ9peq33J4eLRkPstcGtg_-WI3rTda"
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhvZWZ4Z29ha2Z0ZHdrcHNlbG1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMDQ4NDksImV4cCI6MjA5NjU4MDg0OX0.oX3UcS9s8OyArGT06Nne4pQEnWbsTnsJyp0l_EA9K8Y"
 );
 
 /* Load existing pipeline from Supabase on startup */
