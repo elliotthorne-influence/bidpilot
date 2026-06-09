@@ -371,7 +371,7 @@ let searchTerm   = "";
 const $  = (sel, root=document) => root.querySelector(sel);
 const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 const esc = (str="") => str.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const parseDate = iso => new Date(iso + "T00:00:00");
+const parseDate = iso => new Date(iso.includes("T") ? iso : iso + "T00:00:00");
 const fmtShort = iso => iso ? parseDate(iso).toLocaleDateString("en-GB",{day:"2-digit",month:"short"}) : "—";
 const fmtLong  = iso => iso ? parseDate(iso).toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"}) : "—";
 const daysTo   = iso => Math.ceil((parseDate(iso) - TODAY) / 86400000);
