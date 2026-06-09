@@ -312,34 +312,27 @@ function normalise(rec, i){
   };
 }
 
-/* Build a reliable portal URL — use the API-provided URL if it looks like a real
-   notice page, otherwise fall back to a pre-filled search on the right portal.    */
+/* Use the URL stored in tenders.json directly — the fetch script now pulls
+   the real notice URL from the API documents array.                          */
 function portalUrl(rec) {
   const raw = rec.url ?? "";
   const title = rec.title ?? "";
   const src = rec.source ?? rec.src ?? "";
+
+  // If we have a real notice URL, use it
+  if (raw && raw !== "#" &&
+      !raw.endsWith("find-tender.service.gov.uk/") &&
+      !raw.endsWith("contractsfinder.service.gov.uk/")) {
+    return raw;
+  }
+
+  // Fallback: pre-filled search
   const encoded = encodeURIComponent(title);
-
-  // Contracts Finder: use the direct URL if the API provided a real notice link,
-  // otherwise fall back to a pre-filled search
   if (src === "Contracts Finder" || raw.includes("contractsfinder")) {
-    const cfReal = raw.includes("/Published/Notice/") || raw.includes("/notice/");
-    return cfReal
-      ? raw
-      : `https://www.contractsfinder.service.gov.uk/Search/Results?keyword=${encoded}`;
+    return `https://www.contractsfinder.service.gov.uk/Search/Results?keyword=${encoded}`;
   }
-
-  // Find a Tender: derive the notice reference directly from the OCID
-  // e.g. ocds-h6vhtk-0692a0 → /Notice/0692a0
-  const ocid = rec.id ?? "";
-  const noticeRef = ocid.replace("ocds-h6vhtk-", "").trim();
-  if (noticeRef) {
-    return `https://www.find-tender.service.gov.uk/Notice/${noticeRef}`;
-  }
-  // Final fallback — search by title
   return `https://www.find-tender.service.gov.uk/Search/Results?searchTerms=${encoded}`;
 }
-
 /* Load the feed, normalise, render. Falls back to the bundled sample.  */
 async function loadTenders(){
   showFeedState("loading");
