@@ -67,7 +67,9 @@ async function fetchFTS() {
     try { res = await fetch(next, { headers: { Accept: "application/json" } }); }
     catch (e) { console.error("FTS network error:", e.message); break; }
     if (!res.ok) { console.error("FTS HTTP", res.status); break; }
-    const data = await res.json();
+    let data;
+    try { data = await res.json(); }
+    catch (e) { console.error("FTS JSON parse error (skipping page):", e.message); next = null; break; }
     for (const pkg of data.releases ?? []) {
       const t = pkg.tender ?? {};
       const cpv = (t.items ?? []).map(i => i.classification?.id ?? "");
@@ -133,11 +135,90 @@ async function fetchCF() {
   return out;
 }
 
+
+/* ---- 3. SELL2WALES ---- */
+async function fetchS2W() {
+  const out = [];
+  let next = `https://www.sell2wales.gov.wales/api/NoticeReleasePackage`
+           + `?publishedFrom=${dayOnly(since)}&publishedTo=${dayOnly(now)}&size=100`;
+  let pages = 0;
+  while (next && pages < 50) {
+    let res;
+    try { res = await fetch(next, { headers: { Accept: "application/json" } }); }
+    catch (e) { console.error("S2W network error:", e.message); break; }
+    if (!res.ok) { console.error("S2W HTTP", res.status); break; }
+    const data = await res.json();
+    for (const rec of data.results ?? data.releases ?? []) {
+      const r = rec.releases?.[0] ?? rec;
+      const t = r.tender ?? {};
+      const cpv = (t.items ?? []).map(i => i.classification?.id ?? "");
+      if (!isRelevant(t.title ?? "", t.description ?? "", cpv)) continue;
+      const submissionDeadline = t.tenderPeriod?.endDate ?? null;
+      const publishedDate = r.date ?? r.publishedDate ?? null;
+      if (!stillOpen(submissionDeadline, publishedDate)) continue;
+      const docUrl = (t.documents ?? []).find(d => d.url?.includes("sell2wales"))?.url ?? null;
+      out.push({
+        id: r.ocid ?? `s2w-${out.length}`,
+        source: "Sell2Wales",
+        title: t.title ?? "Untitled notice",
+        buyer: r.buyer?.name ?? r.parties?.find(p => p.roles?.includes("buyer"))?.name ?? "",
+        description: (t.description ?? "").replace(/\s+/g, " ").trim().slice(0, 600),
+        pre_engagement: null,
+        question_deadline: t.enquiryPeriod?.endDate ?? null,
+        submission_deadline: submissionDeadline,
+        url: docUrl ?? `https://www.sell2wales.gov.wales/search/search_switch.aspx?ID=${(r.ocid ?? "").replace("ocds-kuma6s-", "")}`
+      });
+    }
+    next = data.links?.next ?? null;
+    pages++;
+  }
+  return out;
+}
+
+/* ---- 4. PUBLIC CONTRACTS SCOTLAND ---- */
+async function fetchPCS() {
+  const out = [];
+  let next = `https://www.publiccontractsscotland.gov.uk/api/NoticeReleasePackage`
+           + `?publishedFrom=${dayOnly(since)}&publishedTo=${dayOnly(now)}&size=100`;
+  let pages = 0;
+  while (next && pages < 50) {
+    let res;
+    try { res = await fetch(next, { headers: { Accept: "application/json" } }); }
+    catch (e) { console.error("PCS network error:", e.message); break; }
+    if (!res.ok) { console.error("PCS HTTP", res.status); break; }
+    const data = await res.json();
+    for (const rec of data.results ?? data.releases ?? []) {
+      const r = rec.releases?.[0] ?? rec;
+      const t = r.tender ?? {};
+      const cpv = (t.items ?? []).map(i => i.classification?.id ?? "");
+      if (!isRelevant(t.title ?? "", t.description ?? "", cpv)) continue;
+      const submissionDeadline = t.tenderPeriod?.endDate ?? null;
+      const publishedDate = r.date ?? r.publishedDate ?? null;
+      if (!stillOpen(submissionDeadline, publishedDate)) continue;
+      const docUrl = (t.documents ?? []).find(d => d.url?.includes("publiccontractsscotland"))?.url ?? null;
+      out.push({
+        id: r.ocid ?? `pcs-${out.length}`,
+        source: "Public Contracts Scotland",
+        title: t.title ?? "Untitled notice",
+        buyer: r.buyer?.name ?? r.parties?.find(p => p.roles?.includes("buyer"))?.name ?? "",
+        description: (t.description ?? "").replace(/\s+/g, " ").trim().slice(0, 600),
+        pre_engagement: null,
+        question_deadline: t.enquiryPeriod?.endDate ?? null,
+        submission_deadline: submissionDeadline,
+        url: docUrl ?? `https://www.publiccontractsscotland.gov.uk/search/search_switch.aspx?ID=${(r.ocid ?? "").replace("ocds-", "")}`
+      });
+    }
+    next = data.links?.next ?? null;
+    pages++;
+  }
+  return out;
+}
+
 /* ---- Run, merge, de-duplicate, upsert into Supabase ---- */
 async function main() {
-  const [fts, cf] = await Promise.all([fetchFTS(), fetchCF()]);
+  const [fts, cf, s2w, pcs] = await Promise.all([fetchFTS(), fetchCF(), fetchS2W(), fetchPCS()]);
   const byId = new Map();
-  for (const row of [...fts, ...cf]) if (!byId.has(row.id)) byId.set(row.id, row);
+  for (const row of [...fts, ...cf, ...s2w, ...pcs]) if (!byId.has(row.id)) byId.set(row.id, row);
   const rows = Array.from(byId.values()).map(r => ({ ...r, refreshed_at: new Date().toISOString() }));
 
   if (!rows.length) {
@@ -154,7 +235,7 @@ async function main() {
     console.error("Supabase upsert failed:", error.message);
     process.exit(1);
   }
-  console.log(`Upserted ${rows.length} live opportunities into Supabase (FTS ${fts.length}, CF ${cf.length}).`);
+  console.log(`Upserted ${rows.length} live opportunities into Supabase (FTS ${fts.length}, CF ${cf.length}, S2W ${s2w.length}, PCS ${pcs.length}).`);
 }
 
 main().catch(e => { console.error("Fatal:", e); process.exit(1); });
