@@ -70,6 +70,8 @@
 
   .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;align-items:center;}
   .chip{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;padding:7px 14px;border:1px solid var(--black);background:#fff;cursor:pointer;transition:.15s;user-select:none;}
+  .source-chip{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;padding:7px 14px;border:1px solid var(--blue);background:#fff;color:var(--blue);cursor:pointer;transition:.15s;user-select:none;}
+  .source-chip:hover{background:#f0f0ff;}.source-chip[aria-pressed="true"]{background:var(--blue);color:#fff;}
   .chip:hover{background:#f0f0f0;}.chip[aria-pressed="true"]{background:var(--black);color:#fff;}
   .search{flex:1;min-width:220px;font-family:var(--mono);font-size:12px;padding:8px 14px;border:1px solid var(--black);background:#fff;}
 
@@ -179,6 +181,13 @@
       <button class="chip" aria-pressed="false" data-f="Research">Research</button>
       <button class="chip" aria-pressed="false" data-f="Production">Production</button>
     </div>
+    <div class="filters" role="group" aria-label="Filter by source">
+      <button class="source-chip" aria-pressed="true" data-s="all">All Sources</button>
+      <button class="source-chip" aria-pressed="false" data-s="Find a Tender">Find a Tender</button>
+      <button class="source-chip" aria-pressed="false" data-s="Contracts Finder">Contracts Finder</button>
+      <button class="source-chip" aria-pressed="false" data-s="Sell2Wales">Sell2Wales</button>
+      <button class="source-chip" aria-pressed="false" data-s="Public Contracts Scotland">Public Contracts Scotland</button>
+    </div>
 
     <div class="tenders" id="tenderGrid"></div>
   </section>
@@ -212,18 +221,21 @@
         <h2>Log a past bid</h2>
         <p class="pdesc">Each record builds the shared bid history used to assess future fit.</p>
         <div class="field"><label for="fTitle">Tender / client</label><input id="fTitle" placeholder="e.g. NMRN — Creative Campaign"></div>
+        <div class="field"><label for="fClient">Client name</label><input id="fClient" placeholder="e.g. National Museums Liverpool"></div>
         <div class="row2">
           <div class="field"><label for="fBuyer">Buyer type</label>
             <select id="fBuyer"><option>Museum / Heritage</option><option>Arts org / Charity</option><option>Central gov</option><option>Local authority</option><option>NHS / Health</option><option>Other public</option></select></div>
-          <div class="field"><label for="fDisc">Discipline</label>
-            <select id="fDisc"><option>Strategy</option><option>Social</option><option>Paid Media</option><option>Creative</option><option>Research</option><option>Production</option></select></div>
+          <div class="field"><label for="fSector">Sector</label>
+            <select id="fSector"><option>Arts &amp; Culture</option><option>Education</option><option>Health</option><option>Central Government</option><option>Local Government</option><option>Charity / Third Sector</option><option>Transport</option><option>Other</option></select></div>
         </div>
         <div class="row2">
+          <div class="field"><label for="fDisc">Discipline</label>
+            <select id="fDisc"><option>Strategy</option><option>Social</option><option>Paid Media</option><option>Creative</option><option>Research</option><option>Production</option></select></div>
           <div class="field"><label for="fValue">Value band</label>
             <select id="fValue"><option>&lt; £50k</option><option>£50k–£150k</option><option>£150k–£500k</option><option>£500k+</option></select></div>
-          <div class="field"><label for="fOutcome">Outcome</label>
-            <select id="fOutcome"><option>Won</option><option>Lost</option></select></div>
         </div>
+        <div class="field"><label for="fOutcome">Outcome</label>
+            <select id="fOutcome"><option>Won</option><option>Lost</option></select></div>
         <button class="logbtn" id="logBtn" type="button">+ Log bid record</button>
       </div>
       <div class="panel">
@@ -403,6 +415,25 @@ const sbClient = window.supabase.createClient(
 );
 
 /* Load existing pipeline from Supabase on startup */
+async function loadRecords(){
+  const { data, error } = await sbClient.from("bid_history").select("*").order("logged_at", { ascending: false });
+  if(error){ console.warn("Could not load bid history:", error.message); return; }
+  if(data) {
+    data.forEach(row => records.push({
+      id:      row.id,
+      title:   row.title,
+      client:  row.client ?? "",
+      buyer:   row.buyer_type,
+      sector:  row.sector ?? "",
+      disc:    row.discipline,
+      value:   row.value_band,
+      outcome: row.outcome
+    }));
+    renderRecords();
+  }
+}
+loadRecords();
+
 async function loadPipeline(){
   const { data } = await sbClient.from("pipeline").select("tender_id");
   if(data) data.forEach(row => pipeline.add(row.tender_id));
@@ -411,6 +442,7 @@ async function loadPipeline(){
 }
 const records  = [];
 let activeFilter = "all";
+let activeSource = "all";
 let searchTerm   = "";
 
 /* ---- small DOM helpers ---- */
@@ -430,8 +462,9 @@ const grid = $("#tenderGrid");
 function renderList(){
   const list = TENDERS.filter(t => {
     const okFilter = activeFilter === "all" || t.disc.includes(activeFilter);
+    const okSource = activeSource === "all" || t.src === activeSource;
     const okSearch = !searchTerm || (t.title + t.buyer + t.syn).toLowerCase().includes(searchTerm);
-    return okFilter && okSearch;
+    return okFilter && okSource && okSearch;
   });
 
   if(!list.length){ grid.innerHTML = '<div class="empty-note">No matching opportunities</div>'; return; }
@@ -510,6 +543,14 @@ $$(".chip").forEach(chip => chip.addEventListener("click", () => {
   activeFilter = chip.dataset.f;
   renderList();
 }));
+
+/* source filters */
+$$(".source-chip").forEach(chip => chip.addEventListener("click", () => {
+  $$(".source-chip").forEach(c => c.setAttribute("aria-pressed","false"));
+  chip.setAttribute("aria-pressed","true");
+  activeSource = chip.dataset.s;
+  renderList();
+}));
 $("#search").addEventListener("input", e => { searchTerm = e.target.value.toLowerCase(); renderList(); });
 
 /* =========================================================
@@ -519,8 +560,6 @@ $("#search").addEventListener("input", e => { searchTerm = e.target.value.toLowe
  *  (role/title) is hidden so only name + icon remain; the icon
  *  toggles an accordion with the full explanation.
  * ========================================================= */
-const agenda = $("#agenda");
-
 /* event delegation for remove buttons */
 agenda.addEventListener("click", e => {
   const btn = e.target.closest(".js-remove");
@@ -655,16 +694,35 @@ window.addEventListener("resize", () => {
 /* =========================================================
  *  WIN INTELLIGENCE (no percentage)
  * ========================================================= */
-$("#logBtn").addEventListener("click", () => {
+$("#logBtn").addEventListener("click", async () => {
   const rec = {
-    title:  $("#fTitle").value.trim() || "Untitled bid",
-    buyer:  $("#fBuyer").value,
-    disc:   $("#fDisc").value,
-    value:  $("#fValue").value,
-    outcome:$("#fOutcome").value
+    title:   $("#fTitle").value.trim() || "Untitled bid",
+    client:  $("#fClient").value.trim(),
+    buyer:   $("#fBuyer").value,
+    sector:  $("#fSector").value,
+    disc:    $("#fDisc").value,
+    value:   $("#fValue").value,
+    outcome: $("#fOutcome").value
   };
+  // Save to Supabase
+  const { data, error } = await sbClient
+    .from("bid_history")
+    .insert({
+      title:      rec.title,
+      buyer_type: rec.buyer,
+      discipline: rec.disc,
+      value_band: rec.value,
+      outcome:    rec.outcome,
+      client:     rec.client,
+      sector:     rec.sector,
+      logged_by:  "team"
+    })
+    .select();
+  if(error){ console.warn("Bid log failed:", error.message); toast("Error saving bid record"); return; }
+  rec.id = data[0].id;
   records.unshift(rec);
   $("#fTitle").value = "";
+  $("#fClient").value = "";
   renderRecords();
   toast("Bid record logged");
 });
@@ -675,11 +733,27 @@ function renderRecords(){
   const box = $("#records");
   if(!records.length){ box.innerHTML = '<div class="empty-note">No records yet</div>'; return; }
   box.innerHTML = records.map(r => `
-    <div class="record ${r.outcome === "Lost" ? "lost" : ""}">
-      <span class="outcome ${r.outcome.toLowerCase()}">${esc(r.outcome)}</span>
+    <div class="record ${r.outcome === "Lost" ? "lost" : ""}" data-id="${esc(String(r.id || ""))}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <span class="outcome ${r.outcome.toLowerCase()}">${esc(r.outcome)}</span>
+        <button class="js-delete-record" data-id="${esc(String(r.id || ""))}" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:0;line-height:1">&#10005;</button>
+      </div>
       <div class="rt">${esc(r.title)}</div>
-      <div class="rm">${esc(r.buyer)} &middot; ${esc(r.disc)} &middot; ${esc(r.value)}</div>
+      <div class="rm">${r.client ? esc(r.client) + " &middot; " : ""}${esc(r.buyer)} &middot; ${r.sector ? esc(r.sector) + " &middot; " : ""}${esc(r.disc)} &middot; ${esc(r.value)}</div>
     </div>`).join("");
+
+  // Add delete listeners
+  box.querySelectorAll(".js-delete-record").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const id = btn.dataset.id;
+      const { error } = await sbClient.from("bid_history").delete().eq("id", id);
+      if(error){ console.warn("Delete failed:", error.message); return; }
+      const idx = records.findIndex(r => String(r.id) === id);
+      if(idx > -1) records.splice(idx, 1);
+      renderRecords();
+      toast("Bid record removed");
+    });
+  });
 }
 
 /* =========================================================
