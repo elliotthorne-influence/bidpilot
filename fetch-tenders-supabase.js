@@ -171,6 +171,20 @@ async function main() {
     console.error("Supabase upsert failed:", error.message);
     process.exit(1);
   }
+
+  // Remove tenders whose submission deadline passed more than 7 days ago
+  const oneWeekAgo = new Date(Date.now() - 7 * 864e5).toISOString();
+  const { error: cleanupError, count } = await supabase
+    .from("tenders")
+    .delete({ count: "exact" })
+    .lt("submission_deadline", oneWeekAgo);
+
+  if (cleanupError) {
+    console.error("Cleanup failed:", cleanupError.message);
+  } else {
+    console.log(`Cleaned up ${count ?? 0} expired tenders from Supabase.`);
+  }
+
   console.log(`Upserted ${rows.length} live opportunities into Supabase (FTS ${fts.length}, CF ${cf.length}, S2W ${s2w.length}, PCS ${pcs.length}).`);
 }
 

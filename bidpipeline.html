@@ -487,7 +487,7 @@ function renderList(){
         <div class="dates">
           ${t.pre ? `<div class="date"><div class="k">Pre-engage</div><div class="v">${fmtShort(t.pre)}</div></div>` : ""}
           ${t.q   ? `<div class="date"><div class="k">Questions</div><div class="v">${fmtShort(t.q)}</div></div>` : ""}
-          ${t.s   ? `<div class="date ${subDays < 14 ? "urgent" : ""}"><div class="k">Submission</div><div class="v">${fmtShort(t.s)}</div></div>` : ""}
+          ${t.s   ? `<div class="date ${subDays < 0 ? "passed" : subDays < 14 ? "urgent" : ""}"><div class="k">Submission${subDays < 0 ? " &#9888; Passed" : ""}</div><div class="v" style="${subDays < 0 ? "text-decoration:line-through;color:var(--muted)" : ""}">${fmtShort(t.s)}</div></div>` : ""}
         </div>
         <div class="cardfoot">
           <button class="btn primary js-pursue ${added ? "added" : ""}" data-id="${esc(String(t.id))}">
