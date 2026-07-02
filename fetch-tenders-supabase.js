@@ -65,7 +65,9 @@ async function fetchFTS() {
     try { res = await fetch(next, { headers: { Accept: "application/json" } }); }
     catch (e) { console.error("FTS network error:", e.message); break; }
     if (!res.ok) { console.error("FTS HTTP", res.status); break; }
-    const data = await res.json();
+    let data;
+    try { data = await res.json(); }
+    catch (e) { console.error("FTS JSON parse error (skipping page):", e.message); break; }
     for (const pkg of data.releases ?? []) {
       const t = pkg.tender ?? {};
       const cpv = (t.items ?? []).map(i => i.classification?.id ?? "");
@@ -127,102 +129,11 @@ async function fetchCF() {
   return out;
 }
 
-
-/* ---- 3. SELL2WALES ---- */
-// API: https://api.sell2wales.gov.wales/v1/Notices?dateFrom=MM-YYYY&noticeType=N&outputType=0
-// noticeType 2 = OJEU Contract Notice, 102 = Website Contract Notice
-async function fetchS2W() {
-  const out = [];
-  const d = new Date();
-  const months = [
-    `${String(d.getMonth() + 1).padStart(2,"0")}-${d.getFullYear()}`,
-    `${String((new Date(d.getFullYear(), d.getMonth()-1,1)).getMonth()+1).padStart(2,"0")}-${(new Date(d.getFullYear(), d.getMonth()-1,1)).getFullYear()}`
-  ];
-  for (const month of months) {
-    for (const noticeType of [2, 102]) {
-      const url = `https://api.sell2wales.gov.wales/v1/Notices?dateFrom=${month}&noticeType=${noticeType}&outputType=0`;
-      let res;
-      try { res = await fetch(url, { headers: { Accept: "application/json" } }); }
-      catch (e) { console.error("S2W network error:", e.message); continue; }
-      if (!res.ok) { console.error("S2W HTTP", res.status); continue; }
-      let data;
-      try { data = await res.json(); }
-      catch (e) { console.error("S2W JSON parse error:", e.message); continue; }
-      for (const pkg of data.releases ?? data ?? []) {
-        const t = pkg.tender ?? {};
-        const cpv = (t.items ?? []).map(i => i.classification?.id ?? "");
-        if (!isRelevant(t.title ?? "", t.description ?? "", cpv)) continue;
-        const submissionDeadline = t.tenderPeriod?.endDate ?? null;
-        const publishedDate = pkg.date ?? pkg.publishedDate ?? null;
-        if (!stillOpen(submissionDeadline, publishedDate)) continue;
-        const noticeNum = (pkg.ocid ?? "").replace("ocds-kuma6s-", "");
-        out.push({
-          id: pkg.ocid ?? `s2w-${out.length}`,
-          source: "Sell2Wales",
-          title: t.title ?? "Untitled notice",
-          buyer: pkg.parties?.find(p => p.roles?.includes("buyer"))?.name ?? "",
-          description: (t.description ?? "").replace(/\s+/g, " ").trim().slice(0, 600),
-          pre_engagement: null,
-          question_deadline: t.enquiryPeriod?.endDate ?? null,
-          submission_deadline: submissionDeadline,
-          url: noticeNum
-            ? `https://www.sell2wales.gov.wales/search/search_switch.aspx?ID=${noticeNum}`
-            : "https://www.sell2wales.gov.wales/"
-        });
-      }
-    }
-  }
-  const seen = new Set();
-  return out.filter(r => { if(seen.has(r.id)) return false; seen.add(r.id); return true; });
-}
-
-/* ---- 4. PUBLIC CONTRACTS SCOTLAND ---- */
-// API: https://api.publiccontractsscotland.gov.uk/v1/Notices?dateFrom=MM-YYYY&noticeType=N&outputType=0
-// noticeType 2 = OJEU Contract Notice, 102 = Website Contract Notice
-async function fetchPCS() {
-  const out = [];
-  const d = new Date();
-  const months = [
-    `${String(d.getMonth() + 1).padStart(2,"0")}-${d.getFullYear()}`,
-    `${String((new Date(d.getFullYear(), d.getMonth()-1,1)).getMonth()+1).padStart(2,"0")}-${(new Date(d.getFullYear(), d.getMonth()-1,1)).getFullYear()}`
-  ];
-  for (const month of months) {
-    for (const noticeType of [2, 102]) {
-      const url = `https://api.publiccontractsscotland.gov.uk/v1/Notices?dateFrom=${month}&noticeType=${noticeType}&outputType=0`;
-      let res;
-      try { res = await fetch(url, { headers: { Accept: "application/json" } }); }
-      catch (e) { console.error("PCS network error:", e.message); continue; }
-      if (!res.ok) { console.error("PCS HTTP", res.status); continue; }
-      let data;
-      try { data = await res.json(); }
-      catch (e) { console.error("PCS JSON parse error:", e.message); continue; }
-      for (const pkg of data.releases ?? data ?? []) {
-        const t = pkg.tender ?? {};
-        const cpv = (t.items ?? []).map(i => i.classification?.id ?? "");
-        if (!isRelevant(t.title ?? "", t.description ?? "", cpv)) continue;
-        const submissionDeadline = t.tenderPeriod?.endDate ?? null;
-        const publishedDate = pkg.date ?? pkg.publishedDate ?? null;
-        if (!stillOpen(submissionDeadline, publishedDate)) continue;
-        const noticeNum = (pkg.ocid ?? "").replace("ocds-r6ebe6-", "");
-        out.push({
-          id: pkg.ocid ?? `pcs-${out.length}`,
-          source: "Public Contracts Scotland",
-          title: t.title ?? "Untitled notice",
-          buyer: pkg.parties?.find(p => p.roles?.includes("buyer"))?.name ?? "",
-          description: (t.description ?? "").replace(/\s+/g, " ").trim().slice(0, 600),
-          pre_engagement: null,
-          question_deadline: t.enquiryPeriod?.endDate ?? null,
-          submission_deadline: submissionDeadline,
-          url: noticeNum
-            ? `https://www.publiccontractsscotland.gov.uk/search/show/search_view.aspx?ID=${noticeNum}`
-            : "https://www.publiccontractsscotland.gov.uk/"
-        });
-      }
-    }
-  }
-  const seen = new Set();
-  return out.filter(r => { if(seen.has(r.id)) return false; seen.add(r.id); return true; });
-}
+/* ---- 3. SELL2WALES & PUBLIC CONTRACTS SCOTLAND ---- */
+// Both APIs block requests from GitHub Actions cloud servers.
+// Stubs return empty arrays so the script doesn't crash.
+async function fetchS2W() { return []; }
+async function fetchPCS() { return []; }
 
 /* ---- Run, merge, de-duplicate, upsert into Supabase ---- */
 async function main() {
