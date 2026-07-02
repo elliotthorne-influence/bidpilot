@@ -129,11 +129,64 @@ async function fetchCF() {
   return out;
 }
 
-/* ---- 3. SELL2WALES & PUBLIC CONTRACTS SCOTLAND ---- */
-// Both APIs block requests from GitHub Actions cloud servers.
-// Stubs return empty arrays so the script doesn't crash.
-async function fetchS2W() { return []; }
-async function fetchPCS() { return []; }
+/* ---- 3. SELL2WALES ---- */
+// Routed via Cloudflare Worker proxy (direct requests blocked from GitHub Actions)
+const PROXY = "https://bidpilot-proxy.elliot-thorne.workers.dev/proxy";
+
+async function fetchMonthly(source, ocidPrefix, portalBase) {
+  const out = [];
+  const d = new Date();
+  const months = [
+    `${d.getMonth() + 1}-${d.getFullYear()}`,
+    `${(new Date(d.getFullYear(), d.getMonth()-1,1)).getMonth()+1}-${(new Date(d.getFullYear(), d.getMonth()-1,1)).getFullYear()}`
+  ];
+  for (const month of months) {
+    for (const noticeType of [2, 102]) {
+      const url = `${PROXY}?source=${source}&month=${month}&noticeType=${noticeType}`;
+      let res;
+      try { res = await fetch(url, { headers: { Accept: "application/json" } }); }
+      catch (e) { console.error(`${source} network error:`, e.message); continue; }
+      if (!res.ok) { console.error(`${source} HTTP`, res.status); continue; }
+      let data;
+      try { data = await res.json(); }
+      catch (e) { console.error(`${source} JSON parse error:`, e.message); continue; }
+      for (const pkg of data.releases ?? []) {
+        const t = pkg.tender ?? {};
+        const cpv = (t.items ?? []).map(i => i.classification?.id ?? "");
+        if (!isRelevant(t.title ?? "", t.description ?? "", cpv)) continue;
+        const submissionDeadline = t.tenderPeriod?.endDate ?? null;
+        const publishedDate = pkg.date ?? null;
+        if (!stillOpen(submissionDeadline, publishedDate)) continue;
+        const docUrl = (t.documents ?? []).find(d => d.url?.includes(portalBase))?.url ?? null;
+        const noticeNum = (pkg.ocid ?? "").replace(ocidPrefix, "");
+        out.push({
+          id: pkg.ocid ?? `${source}-${out.length}`,
+          source: source === "s2w" ? "Sell2Wales" : "Public Contracts Scotland",
+          title: t.title ?? "Untitled notice",
+          buyer: pkg.parties?.find(p => p.roles?.includes("buyer"))?.name ?? "",
+          description: (t.description ?? "").replace(/\s+/g, " ").trim().slice(0, 600),
+          pre_engagement: null,
+          question_deadline: t.enquiryPeriod?.endDate ?? null,
+          submission_deadline: submissionDeadline,
+          url: docUrl ?? (noticeNum
+            ? `https://www.${portalBase}/search/search_switch.aspx?ID=${noticeNum}`
+            : `https://www.${portalBase}/`)
+        });
+      }
+    }
+  }
+  const seen = new Set();
+  return out.filter(r => { if(seen.has(r.id)) return false; seen.add(r.id); return true; });
+}
+
+async function fetchS2W() {
+  return fetchMonthly("s2w", "ocds-kuma6s-", "sell2wales.gov.wales");
+}
+
+/* ---- 4. PUBLIC CONTRACTS SCOTLAND ---- */
+async function fetchPCS() {
+  return fetchMonthly("pcs", "ocds-r6ebe6-", "publiccontractsscotland.gov.uk");
+}
 
 /* ---- Run, merge, de-duplicate, upsert into Supabase ---- */
 async function main() {
