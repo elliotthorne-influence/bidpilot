@@ -15,7 +15,6 @@
 //   Contracts Finder: https://www.contractsfinder.service.gov.uk/apidocumentation/home
 
 import { createClient } from "@supabase/supabase-js";
-import ws from "ws";
 
 /* ---- Supabase connection (from environment, never hard-coded) ---- */
 const SUPABASE_URL = process.env.SUPABASE_URL;
@@ -25,8 +24,7 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
   process.exit(1);
 }
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
-  auth: { persistSession: false },
-  realtime: { transport: ws }
+  auth: { persistSession: false }
 });
 
 /* ---- Filter: CPV codes that map to agency disciplines ---- */
@@ -67,9 +65,7 @@ async function fetchFTS() {
     try { res = await fetch(next, { headers: { Accept: "application/json" } }); }
     catch (e) { console.error("FTS network error:", e.message); break; }
     if (!res.ok) { console.error("FTS HTTP", res.status); break; }
-    let data;
-    try { data = await res.json(); }
-    catch (e) { console.error("FTS JSON parse error (skipping page):", e.message); next = null; break; }
+    const data = await res.json();
     for (const pkg of data.releases ?? []) {
       const t = pkg.tender ?? {};
       const cpv = (t.items ?? []).map(i => i.classification?.id ?? "");
@@ -77,13 +73,7 @@ async function fetchFTS() {
       if (!["active", "planning"].includes(t.status)) continue;
       const submissionDeadline = t.tenderPeriod?.endDate ?? null;
       if (!stillOpen(submissionDeadline)) continue;
-      // Pull the real notice URL from the documents array first,
-      // then fall back to tender.id, then null
-      const docUrl = (t.documents ?? []).find(d => d.url?.includes("find-tender"))?.url ?? null;
-      const tenderId = t.id ?? "";
-      const ftsUrl = docUrl
-        ?? (tenderId ? `https://www.find-tender.service.gov.uk/Notice/${tenderId}` : null)
-        ?? "https://www.find-tender.service.gov.uk/";
+      const noticeId = (pkg.ocid ?? "").replace("ocds-h6vhtk-", "");
       out.push({
         id: pkg.ocid,
         source: "Find a Tender",
@@ -93,7 +83,9 @@ async function fetchFTS() {
         pre_engagement: null,
         question_deadline: t.enquiryPeriod?.endDate ?? null,
         submission_deadline: submissionDeadline,
-        url: ftsUrl
+        url: noticeId
+          ? `https://www.find-tender.service.gov.uk/Notice/${noticeId}`
+          : "https://www.find-tender.service.gov.uk/"
       });
     }
     next = data.links?.next ?? null;
@@ -137,17 +129,99 @@ async function fetchCF() {
 
 
 /* ---- 3. SELL2WALES ---- */
-// API endpoint format differs from FTS/CF — disabled pending verification
+// API: https://api.sell2wales.gov.wales/v1/Notices?dateFrom=MM-YYYY&noticeType=N&outputType=0
+// noticeType 2 = OJEU Contract Notice, 102 = Website Contract Notice
 async function fetchS2W() {
-  console.log("Sell2Wales fetch disabled pending API verification.");
-  return [];
+  const out = [];
+  const d = new Date();
+  const months = [
+    `${String(d.getMonth() + 1).padStart(2,"0")}-${d.getFullYear()}`,
+    `${String((new Date(d.getFullYear(), d.getMonth()-1,1)).getMonth()+1).padStart(2,"0")}-${(new Date(d.getFullYear(), d.getMonth()-1,1)).getFullYear()}`
+  ];
+  for (const month of months) {
+    for (const noticeType of [2, 102]) {
+      const url = `https://api.sell2wales.gov.wales/v1/Notices?dateFrom=${month}&noticeType=${noticeType}&outputType=0`;
+      let res;
+      try { res = await fetch(url, { headers: { Accept: "application/json" } }); }
+      catch (e) { console.error("S2W network error:", e.message); continue; }
+      if (!res.ok) { console.error("S2W HTTP", res.status); continue; }
+      let data;
+      try { data = await res.json(); }
+      catch (e) { console.error("S2W JSON parse error:", e.message); continue; }
+      for (const pkg of data.releases ?? data ?? []) {
+        const t = pkg.tender ?? {};
+        const cpv = (t.items ?? []).map(i => i.classification?.id ?? "");
+        if (!isRelevant(t.title ?? "", t.description ?? "", cpv)) continue;
+        const submissionDeadline = t.tenderPeriod?.endDate ?? null;
+        const publishedDate = pkg.date ?? pkg.publishedDate ?? null;
+        if (!stillOpen(submissionDeadline, publishedDate)) continue;
+        const noticeNum = (pkg.ocid ?? "").replace("ocds-kuma6s-", "");
+        out.push({
+          id: pkg.ocid ?? `s2w-${out.length}`,
+          source: "Sell2Wales",
+          title: t.title ?? "Untitled notice",
+          buyer: pkg.parties?.find(p => p.roles?.includes("buyer"))?.name ?? "",
+          description: (t.description ?? "").replace(/\s+/g, " ").trim().slice(0, 600),
+          pre_engagement: null,
+          question_deadline: t.enquiryPeriod?.endDate ?? null,
+          submission_deadline: submissionDeadline,
+          url: noticeNum
+            ? `https://www.sell2wales.gov.wales/search/search_switch.aspx?ID=${noticeNum}`
+            : "https://www.sell2wales.gov.wales/"
+        });
+      }
+    }
+  }
+  const seen = new Set();
+  return out.filter(r => { if(seen.has(r.id)) return false; seen.add(r.id); return true; });
 }
 
 /* ---- 4. PUBLIC CONTRACTS SCOTLAND ---- */
-// API endpoint format differs from FTS/CF — disabled pending verification
+// API: https://api.publiccontractsscotland.gov.uk/v1/Notices?dateFrom=MM-YYYY&noticeType=N&outputType=0
+// noticeType 2 = OJEU Contract Notice, 102 = Website Contract Notice
 async function fetchPCS() {
-  console.log("Public Contracts Scotland fetch disabled pending API verification.");
-  return [];
+  const out = [];
+  const d = new Date();
+  const months = [
+    `${String(d.getMonth() + 1).padStart(2,"0")}-${d.getFullYear()}`,
+    `${String((new Date(d.getFullYear(), d.getMonth()-1,1)).getMonth()+1).padStart(2,"0")}-${(new Date(d.getFullYear(), d.getMonth()-1,1)).getFullYear()}`
+  ];
+  for (const month of months) {
+    for (const noticeType of [2, 102]) {
+      const url = `https://api.publiccontractsscotland.gov.uk/v1/Notices?dateFrom=${month}&noticeType=${noticeType}&outputType=0`;
+      let res;
+      try { res = await fetch(url, { headers: { Accept: "application/json" } }); }
+      catch (e) { console.error("PCS network error:", e.message); continue; }
+      if (!res.ok) { console.error("PCS HTTP", res.status); continue; }
+      let data;
+      try { data = await res.json(); }
+      catch (e) { console.error("PCS JSON parse error:", e.message); continue; }
+      for (const pkg of data.releases ?? data ?? []) {
+        const t = pkg.tender ?? {};
+        const cpv = (t.items ?? []).map(i => i.classification?.id ?? "");
+        if (!isRelevant(t.title ?? "", t.description ?? "", cpv)) continue;
+        const submissionDeadline = t.tenderPeriod?.endDate ?? null;
+        const publishedDate = pkg.date ?? pkg.publishedDate ?? null;
+        if (!stillOpen(submissionDeadline, publishedDate)) continue;
+        const noticeNum = (pkg.ocid ?? "").replace("ocds-r6ebe6-", "");
+        out.push({
+          id: pkg.ocid ?? `pcs-${out.length}`,
+          source: "Public Contracts Scotland",
+          title: t.title ?? "Untitled notice",
+          buyer: pkg.parties?.find(p => p.roles?.includes("buyer"))?.name ?? "",
+          description: (t.description ?? "").replace(/\s+/g, " ").trim().slice(0, 600),
+          pre_engagement: null,
+          question_deadline: t.enquiryPeriod?.endDate ?? null,
+          submission_deadline: submissionDeadline,
+          url: noticeNum
+            ? `https://www.publiccontractsscotland.gov.uk/search/show/search_view.aspx?ID=${noticeNum}`
+            : "https://www.publiccontractsscotland.gov.uk/"
+        });
+      }
+    }
+  }
+  const seen = new Set();
+  return out.filter(r => { if(seen.has(r.id)) return false; seen.add(r.id); return true; });
 }
 
 /* ---- Run, merge, de-duplicate, upsert into Supabase ---- */
@@ -171,20 +245,6 @@ async function main() {
     console.error("Supabase upsert failed:", error.message);
     process.exit(1);
   }
-
-  // Remove tenders whose submission deadline passed more than 7 days ago
-  const oneWeekAgo = new Date(Date.now() - 7 * 864e5).toISOString();
-  const { error: cleanupError, count } = await supabase
-    .from("tenders")
-    .delete({ count: "exact" })
-    .lt("submission_deadline", oneWeekAgo);
-
-  if (cleanupError) {
-    console.error("Cleanup failed:", cleanupError.message);
-  } else {
-    console.log(`Cleaned up ${count ?? 0} expired tenders from Supabase.`);
-  }
-
   console.log(`Upserted ${rows.length} live opportunities into Supabase (FTS ${fts.length}, CF ${cf.length}, S2W ${s2w.length}, PCS ${pcs.length}).`);
 }
 
