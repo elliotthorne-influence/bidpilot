@@ -283,13 +283,46 @@ function deriveDisciplines(text){
 /* Map one record from tenders.json (OCDS-shaped) into the UI shape.   *
  * Accepts either the slim fields the fetch script writes, or close     *
  * variants, so minor feed changes don't break the UI.                  */
+/* Build reliable portal URL from stored data */
+function portalUrl(rec) {
+  const raw = rec.url ?? "";
+  const title = rec.title ?? "";
+  const src = rec.source ?? rec.src ?? "";
+  const ocid = rec.id ?? "";
+
+  // Use stored URL if it looks like a real notice page
+  if (raw && raw !== "#" &&
+      !raw.endsWith("find-tender.service.gov.uk/") &&
+      !raw.endsWith("contractsfinder.service.gov.uk/") &&
+      !raw.endsWith("sell2wales.gov.wales/") &&
+      !raw.endsWith("publiccontractsscotland.gov.uk/")) {
+    return raw;
+  }
+
+  // Fall back to search
+  const encoded = encodeURIComponent(title);
+  if (src === "Contracts Finder" || raw.includes("contractsfinder")) {
+    return `https://www.contractsfinder.service.gov.uk/Search/Results?keyword=${encoded}`;
+  }
+  if (src === "Public Contracts Scotland" || raw.includes("publiccontractsscotland")) {
+    return `https://www.publiccontractsscotland.gov.uk/Search/Search_Switch.aspx?SearchType=1&keyword=${encoded}`;
+  }
+  if (src === "Sell2Wales" || raw.includes("sell2wales")) {
+    return `https://www.sell2wales.gov.wales/search/search_results.aspx?keyword=${encoded}`;
+  }
+  // Find a Tender — use OCID-derived notice ID
+  const noticeRef = ocid.replace("ocds-h6vhtk-", "").trim();
+  if (noticeRef) return `https://www.find-tender.service.gov.uk/Notice/${noticeRef}`;
+  return `https://www.find-tender.service.gov.uk/Search/Results?searchTerms=${encoded}`;
+}
+
 function normalise(rec, i){
   const title = rec.title ?? rec.tender?.title ?? "Untitled notice";
   const buyer = rec.buyer ?? rec.tender?.buyer ?? "";
   const syn   = rec.description ?? rec.synopsis ?? rec.syn ?? "";
-  const q     = rec.questionDeadline   ?? rec.q ?? null;
-  const s     = rec.submissionDeadline ?? rec.s ?? null;
-  const pre   = rec.preEngagement ?? rec.pre ?? null;
+  const q     = rec.questionDeadline   ?? rec.question_deadline  ?? rec.q ?? null;
+  const s     = rec.submissionDeadline ?? rec.submission_deadline ?? rec.s ?? null;
+  const pre   = rec.preEngagement ?? rec.pre_engagement ?? rec.pre ?? null;
 
   // Derive the dominant stage from which dates exist / are still ahead.
   let stage = rec.stage;
@@ -304,7 +337,7 @@ function normalise(rec, i){
     id:    rec.id ?? rec.ocid ?? `t-${i}`,
     title, buyer,
     src:   rec.source ?? rec.src ?? "Find a Tender",
-    url:   rec.url ?? "#",
+    url:   portalUrl(rec),
     disc:  Array.isArray(rec.disc) ? rec.disc : deriveDisciplines(`${title} ${syn}`),
     stage,
     syn:   syn.length > 600 ? syn.slice(0,597) + "…" : syn,
