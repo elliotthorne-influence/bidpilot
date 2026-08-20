@@ -70,8 +70,6 @@
 
   .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;align-items:center;}
   .chip{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;padding:7px 14px;border:1px solid var(--black);background:#fff;cursor:pointer;transition:.15s;user-select:none;}
-  .source-chip{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;padding:7px 14px;border:1px solid var(--blue);background:#fff;color:var(--blue);cursor:pointer;transition:.15s;user-select:none;}
-  .source-chip:hover{background:#f0f0ff;}.source-chip[aria-pressed="true"]{background:var(--blue);color:#fff;}
   .chip:hover{background:#f0f0f0;}.chip[aria-pressed="true"]{background:var(--black);color:#fff;}
   .search{flex:1;min-width:220px;font-family:var(--mono);font-size:12px;padding:8px 14px;border:1px solid var(--black);background:#fff;}
 
@@ -181,13 +179,6 @@
       <button class="chip" aria-pressed="false" data-f="Research">Research</button>
       <button class="chip" aria-pressed="false" data-f="Production">Production</button>
     </div>
-    <div class="filters" role="group" aria-label="Filter by source">
-      <button class="source-chip" aria-pressed="true" data-s="all">All Sources</button>
-      <button class="source-chip" aria-pressed="false" data-s="Find a Tender">Find a Tender</button>
-      <button class="source-chip" aria-pressed="false" data-s="Contracts Finder">Contracts Finder</button>
-      <button class="source-chip" aria-pressed="false" data-s="Sell2Wales">Sell2Wales</button>
-      <button class="source-chip" aria-pressed="false" data-s="Public Contracts Scotland">Public Contracts Scotland</button>
-    </div>
 
     <div class="tenders" id="tenderGrid"></div>
   </section>
@@ -221,21 +212,18 @@
         <h2>Log a past bid</h2>
         <p class="pdesc">Each record builds the shared bid history used to assess future fit.</p>
         <div class="field"><label for="fTitle">Tender / client</label><input id="fTitle" placeholder="e.g. NMRN — Creative Campaign"></div>
-        <div class="field"><label for="fClient">Client name</label><input id="fClient" placeholder="e.g. National Museums Liverpool"></div>
         <div class="row2">
           <div class="field"><label for="fBuyer">Buyer type</label>
             <select id="fBuyer"><option>Museum / Heritage</option><option>Arts org / Charity</option><option>Central gov</option><option>Local authority</option><option>NHS / Health</option><option>Other public</option></select></div>
-          <div class="field"><label for="fSector">Sector</label>
-            <select id="fSector"><option>Arts &amp; Culture</option><option>Education</option><option>Health</option><option>Central Government</option><option>Local Government</option><option>Charity / Third Sector</option><option>Transport</option><option>Other</option></select></div>
-        </div>
-        <div class="row2">
           <div class="field"><label for="fDisc">Discipline</label>
             <select id="fDisc"><option>Strategy</option><option>Social</option><option>Paid Media</option><option>Creative</option><option>Research</option><option>Production</option></select></div>
+        </div>
+        <div class="row2">
           <div class="field"><label for="fValue">Value band</label>
             <select id="fValue"><option>&lt; £50k</option><option>£50k–£150k</option><option>£150k–£500k</option><option>£500k+</option></select></div>
-        </div>
-        <div class="field"><label for="fOutcome">Outcome</label>
+          <div class="field"><label for="fOutcome">Outcome</label>
             <select id="fOutcome"><option>Won</option><option>Lost</option></select></div>
+        </div>
         <button class="logbtn" id="logBtn" type="button">+ Log bid record</button>
       </div>
       <div class="panel">
@@ -251,7 +239,6 @@
 <footer>Influence Digital &middot; BidPilot &middot; opportunities are real notices from Find a Tender &amp; Contracts Finder</footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 "use strict";
 
@@ -299,9 +286,9 @@ function normalise(rec, i){
   const title = rec.title ?? rec.tender?.title ?? "Untitled notice";
   const buyer = rec.buyer ?? rec.tender?.buyer ?? "";
   const syn   = rec.description ?? rec.synopsis ?? rec.syn ?? "";
-  const q     = rec.questionDeadline   ?? rec.question_deadline  ?? rec.q ?? null;
-  const s     = rec.submissionDeadline ?? rec.submission_deadline ?? rec.s ?? null;
-  const pre   = rec.preEngagement ?? rec.pre_engagement ?? rec.pre ?? null;
+  const q     = rec.questionDeadline   ?? rec.q ?? null;
+  const s     = rec.submissionDeadline ?? rec.s ?? null;
+  const pre   = rec.preEngagement ?? rec.pre ?? null;
 
   // Derive the dominant stage from which dates exist / are still ahead.
   let stage = rec.stage;
@@ -316,7 +303,7 @@ function normalise(rec, i){
     id:    rec.id ?? rec.ocid ?? `t-${i}`,
     title, buyer,
     src:   rec.source ?? rec.src ?? "Find a Tender",
-    url:   portalUrl(rec),
+    url:   rec.url ?? "#",
     disc:  Array.isArray(rec.disc) ? rec.disc : deriveDisciplines(`${title} ${syn}`),
     stage,
     syn:   syn.length > 600 ? syn.slice(0,597) + "…" : syn,
@@ -325,54 +312,23 @@ function normalise(rec, i){
   };
 }
 
-/* Use the URL stored in tenders.json directly — the fetch script now pulls
-   the real notice URL from the API documents array.                          */
-function portalUrl(rec) {
-  const raw = rec.url ?? "";
-  const title = rec.title ?? "";
-  const src = rec.source ?? rec.src ?? "";
-  const ocid = rec.id ?? "";
-
-  // If the stored URL looks like a real notice page, use it directly
-  if (raw && raw !== "#" &&
-      !raw.endsWith("find-tender.service.gov.uk/") &&
-      !raw.endsWith("contractsfinder.service.gov.uk/")) {
-    return raw;
-  }
-
-  // If we have an OCID, try to extract the notice number from it
-  // tenders.json may have the correct URL but it might be stored in id field
-  // Real FTS notice numbers look like: 052705-2026
-  const ocidRef = ocid.replace("ocds-h6vhtk-", "").trim();
-
-  // Fallback: pre-filled search
-  const encoded = encodeURIComponent(title);
-  if (src === "Contracts Finder" || raw.includes("contractsfinder")) {
-    return `https://www.contractsfinder.service.gov.uk/Search/Results?keyword=${encoded}`;
-  }
-  return `https://www.find-tender.service.gov.uk/Search/Results?searchTerms=${encoded}`;
-}
-/* Load the feed from Supabase, normalise, render. Falls back to bundled sample. */
+/* Load the feed, normalise, render. Falls back to the bundled sample.  */
 async function loadTenders(){
   showFeedState("loading");
   try{
-    const sb = window.supabase.createClient(
-      "https://hoefxgoakftdwkpselmo.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhvZWZ4Z29ha2Z0ZHdrcHNlbG1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMDQ4NDksImV4cCI6MjA5NjU4MDg0OX0.oX3UcS9s8OyArGT06Nne4pQEnWbsTnsJyp0l_EA9K8Y"
-    );
-    const { data, error } = await sb
-      .from("tenders")
-      .select("*")
-      .order("submission_deadline", { ascending: true });
-    if(error) throw new Error(error.message);
-    if(!data.length) throw new Error("empty feed");
-    TENDERS = data.map(normalise);
-    showFeedState("ok", {count:TENDERS.length, generatedAt:new Date().toISOString()});
+    const res = await fetch("tenders.json", {cache:"no-store"});
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const raw = await res.json();
+    const rows = Array.isArray(raw) ? raw : (raw.tenders ?? raw.results ?? []);
+    if(!rows.length) throw new Error("empty feed");
+    TENDERS = rows.map(normalise);
+    showFeedState("ok", {count:TENDERS.length, generatedAt:raw.generatedAt});
   }catch(err){
     TENDERS = FALLBACK.map(normalise);
     showFeedState("error", {message:err.message});
   }
-  await loadPipeline();
+  renderList();
+  renderAgenda();
 }
 
 /* Surface feed status in the Discover sub-header + banner.             */
@@ -387,7 +343,7 @@ function showFeedState(state, info = {}){
   if(state === "ok"){
     const when = info.generatedAt ? new Date(info.generatedAt) : new Date();
     if(sync) sync.textContent = "feed updated " + when.toLocaleString("en-GB",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});
-    if(note){ note.textContent = `◆ ${info.count} live opportunities from Find a Tender & Contracts Finder — every card links to its source. If a link doesn't open, copy the opportunity name or URL into Google to find it.`; note.dataset.state = "ok"; }
+    if(note){ note.textContent = `◆ ${info.count} live opportunities from Find a Tender & Contracts Finder — every card links to its source`; note.dataset.state = "ok"; }
   }
   if(state === "error"){
     if(sync) sync.textContent = "live feed unavailable";
@@ -407,49 +363,15 @@ const TODAY = (() => { const d = new Date(); d.setHours(0,0,0,0); return d; })()
 
 /* ---- app state ---- */
 const pipeline = new Set();
-
-/* Supabase client for pipeline writes (same project, publishable key) */
-const sbClient = window.supabase.createClient(
-  "https://hoefxgoakftdwkpselmo.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhvZWZ4Z29ha2Z0ZHdrcHNlbG1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMDQ4NDksImV4cCI6MjA5NjU4MDg0OX0.oX3UcS9s8OyArGT06Nne4pQEnWbsTnsJyp0l_EA9K8Y"
-);
-
-/* Load existing pipeline from Supabase on startup */
-async function loadRecords(){
-  const { data, error } = await sbClient.from("bid_history").select("*").order("logged_at", { ascending: false });
-  if(error){ console.warn("Could not load bid history:", error.message); return; }
-  if(data) {
-    data.forEach(row => records.push({
-      id:      row.id,
-      title:   row.title,
-      client:  row.client ?? "",
-      buyer:   row.buyer_type,
-      sector:  row.sector ?? "",
-      disc:    row.discipline,
-      value:   row.value_band,
-      outcome: row.outcome
-    }));
-    renderRecords();
-  }
-}
-loadRecords();
-
-async function loadPipeline(){
-  const { data } = await sbClient.from("pipeline").select("tender_id");
-  if(data) data.forEach(row => pipeline.add(row.tender_id));
-  renderList();
-  renderAgenda();
-}
 const records  = [];
 let activeFilter = "all";
-let activeSource = "all";
 let searchTerm   = "";
 
 /* ---- small DOM helpers ---- */
 const $  = (sel, root=document) => root.querySelector(sel);
 const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 const esc = (str="") => str.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const parseDate = iso => new Date(iso.includes("T") ? iso : iso + "T00:00:00");
+const parseDate = iso => new Date(iso + "T00:00:00");
 const fmtShort = iso => iso ? parseDate(iso).toLocaleDateString("en-GB",{day:"2-digit",month:"short"}) : "—";
 const fmtLong  = iso => iso ? parseDate(iso).toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"}) : "—";
 const daysTo   = iso => Math.ceil((parseDate(iso) - TODAY) / 86400000);
@@ -465,6 +387,25 @@ function renderList(){
     const okSource = activeSource === "all" || t.src === activeSource;
     const okSearch = !searchTerm || (t.title + t.buyer + t.syn).toLowerCase().includes(searchTerm);
     return okFilter && okSource && okSearch;
+  });
+
+  // Sort: live tenders with future deadlines first (soonest first),
+  // then tenders with no deadline, then expired ones last
+  list.sort((a, b) => {
+    const aDays = a.s ? daysTo(a.s) : null;
+    const bDays = b.s ? daysTo(b.s) : null;
+    const aExpired = aDays !== null && aDays < 0;
+    const bExpired = bDays !== null && bDays < 0;
+
+    // Expired tenders go to the bottom
+    if (aExpired && !bExpired) return 1;
+    if (!aExpired && bExpired) return -1;
+
+    // Both expired or both live — sort by deadline (soonest first, nulls last)
+    if (aDays === null && bDays === null) return 0;
+    if (aDays === null) return 1;
+    if (bDays === null) return -1;
+    return aDays - bDays;
   });
 
   if(!list.length){ grid.innerHTML = '<div class="empty-note">No matching opportunities</div>'; return; }
@@ -487,10 +428,10 @@ function renderList(){
         <div class="dates">
           ${t.pre ? `<div class="date"><div class="k">Pre-engage</div><div class="v">${fmtShort(t.pre)}</div></div>` : ""}
           ${t.q   ? `<div class="date"><div class="k">Questions</div><div class="v">${fmtShort(t.q)}</div></div>` : ""}
-          ${t.s   ? `<div class="date ${subDays < 0 ? "passed" : subDays < 14 ? "urgent" : ""}"><div class="k">Submission${subDays < 0 ? " &#9888; Passed" : ""}</div><div class="v" style="${subDays < 0 ? "text-decoration:line-through;color:var(--muted)" : ""}">${fmtShort(t.s)}</div></div>` : ""}
+          ${t.s   ? `<div class="date ${subDays < 14 ? "urgent" : ""}"><div class="k">Submission</div><div class="v">${fmtShort(t.s)}</div></div>` : ""}
         </div>
         <div class="cardfoot">
-          <button class="btn primary js-pursue ${added ? "added" : ""}" data-id="${esc(String(t.id))}">
+          <button class="btn primary js-pursue ${added ? "added" : ""}" data-id="${esc(String(t.id))}" ${added ? "disabled" : ""}>
             ${added ? "&#10003; In pipeline" : "Pursue &#10142;"}
           </button>
           <a class="btn portal" href="${esc(t.url)}" target="_blank" rel="noopener noreferrer"
@@ -504,34 +445,14 @@ function renderList(){
 grid.addEventListener("click", e => {
   const btn = e.target.closest(".js-pursue");
   if(!btn) return;
-  if(pipeline.has(btn.dataset.id)){
-    removeFromPipeline(btn.dataset.id);
-  } else {
-    pursue(btn.dataset.id);
-  }
+  pursue(btn.dataset.id);
 });
 
-async function pursue(id){
+function pursue(id){
   if(pipeline.has(id)) return;
   pipeline.add(id);
   const t = TENDERS.find(x => x.id === id);
-  // Save to Supabase so it persists and the whole team sees it
-  const { error } = await sbClient
-    .from("pipeline")
-    .insert({ tender_id: id, added_by: "team" });
-  if(error) console.warn("Pipeline save failed:", error.message);
-  toast(`Added to pipeline: ${t?.buyer ?? id}`);
-  renderList();
-  renderAgenda();
-}
-
-async function removeFromPipeline(id){
-  pipeline.delete(id);
-  const { error } = await sbClient
-    .from("pipeline")
-    .delete()
-    .eq("tender_id", id);
-  if(error) console.warn("Pipeline remove failed:", error.message);
+  toast(`Added to pipeline: ${t.buyer}`);
   renderList();
   renderAgenda();
 }
@@ -543,14 +464,6 @@ $$(".chip").forEach(chip => chip.addEventListener("click", () => {
   activeFilter = chip.dataset.f;
   renderList();
 }));
-
-/* source filters */
-$$(".source-chip").forEach(chip => chip.addEventListener("click", () => {
-  $$(".source-chip").forEach(c => c.setAttribute("aria-pressed","false"));
-  chip.setAttribute("aria-pressed","true");
-  activeSource = chip.dataset.s;
-  renderList();
-}));
 $("#search").addEventListener("input", e => { searchTerm = e.target.value.toLowerCase(); renderList(); });
 
 /* =========================================================
@@ -560,12 +473,7 @@ $("#search").addEventListener("input", e => { searchTerm = e.target.value.toLowe
  *  (role/title) is hidden so only name + icon remain; the icon
  *  toggles an accordion with the full explanation.
  * ========================================================= */
-/* event delegation for remove buttons */
-agenda.addEventListener("click", e => {
-  const btn = e.target.closest(".js-remove");
-  if(!btn) return;
-  removeFromPipeline(btn.dataset.id);
-});
+const agenda = $("#agenda");
 
 function buildEvents(){
   const events = [];
@@ -612,7 +520,6 @@ function eventChip(ev, key){
         <p class="syn">${esc(t.syn)}</p>
         <a class="btn portal" href="${esc(t.url)}" target="_blank" rel="noopener noreferrer"
            aria-label="View ${esc(t.buyer)} notice on ${esc(t.src)} (opens in new tab)">View on portal &#8599;</a>
-        <button class="btn js-remove" data-id="${esc(String(t.id))}" style="margin-top:8px;background:#fff;border:1px solid #ccc;color:#666;">&#10005; Remove from pipeline</button>
       </div>
     </div>`;
 }
@@ -694,35 +601,16 @@ window.addEventListener("resize", () => {
 /* =========================================================
  *  WIN INTELLIGENCE (no percentage)
  * ========================================================= */
-$("#logBtn").addEventListener("click", async () => {
+$("#logBtn").addEventListener("click", () => {
   const rec = {
-    title:   $("#fTitle").value.trim() || "Untitled bid",
-    client:  $("#fClient").value.trim(),
-    buyer:   $("#fBuyer").value,
-    sector:  $("#fSector").value,
-    disc:    $("#fDisc").value,
-    value:   $("#fValue").value,
-    outcome: $("#fOutcome").value
+    title:  $("#fTitle").value.trim() || "Untitled bid",
+    buyer:  $("#fBuyer").value,
+    disc:   $("#fDisc").value,
+    value:  $("#fValue").value,
+    outcome:$("#fOutcome").value
   };
-  // Save to Supabase
-  const { data, error } = await sbClient
-    .from("bid_history")
-    .insert({
-      title:      rec.title,
-      buyer_type: rec.buyer,
-      discipline: rec.disc,
-      value_band: rec.value,
-      outcome:    rec.outcome,
-      client:     rec.client,
-      sector:     rec.sector,
-      logged_by:  "team"
-    })
-    .select();
-  if(error){ console.warn("Bid log failed:", error.message); toast("Error saving bid record"); return; }
-  rec.id = data[0].id;
   records.unshift(rec);
   $("#fTitle").value = "";
-  $("#fClient").value = "";
   renderRecords();
   toast("Bid record logged");
 });
@@ -733,27 +621,11 @@ function renderRecords(){
   const box = $("#records");
   if(!records.length){ box.innerHTML = '<div class="empty-note">No records yet</div>'; return; }
   box.innerHTML = records.map(r => `
-    <div class="record ${r.outcome === "Lost" ? "lost" : ""}" data-id="${esc(String(r.id || ""))}">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start">
-        <span class="outcome ${r.outcome.toLowerCase()}">${esc(r.outcome)}</span>
-        <button class="js-delete-record" data-id="${esc(String(r.id || ""))}" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:0;line-height:1">&#10005;</button>
-      </div>
+    <div class="record ${r.outcome === "Lost" ? "lost" : ""}">
+      <span class="outcome ${r.outcome.toLowerCase()}">${esc(r.outcome)}</span>
       <div class="rt">${esc(r.title)}</div>
-      <div class="rm">${r.client ? esc(r.client) + " &middot; " : ""}${esc(r.buyer)} &middot; ${r.sector ? esc(r.sector) + " &middot; " : ""}${esc(r.disc)} &middot; ${esc(r.value)}</div>
+      <div class="rm">${esc(r.buyer)} &middot; ${esc(r.disc)} &middot; ${esc(r.value)}</div>
     </div>`).join("");
-
-  // Add delete listeners
-  box.querySelectorAll(".js-delete-record").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      const id = btn.dataset.id;
-      const { error } = await sbClient.from("bid_history").delete().eq("id", id);
-      if(error){ console.warn("Delete failed:", error.message); return; }
-      const idx = records.findIndex(r => String(r.id) === id);
-      if(idx > -1) records.splice(idx, 1);
-      renderRecords();
-      toast("Bid record removed");
-    });
-  });
 }
 
 /* =========================================================
