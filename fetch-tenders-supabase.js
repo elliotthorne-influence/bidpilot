@@ -75,7 +75,11 @@ async function fetchFTS() {
       if (!["active", "planning"].includes(t.status)) continue;
       const submissionDeadline = t.tenderPeriod?.endDate ?? null;
       if (!stillOpen(submissionDeadline)) continue;
-      const noticeId = (pkg.ocid ?? "").replace("ocds-h6vhtk-", "");
+      const docUrl = (t.documents ?? []).find(d => d.url?.includes("find-tender"))?.url ?? null;
+      const tenderId = t.id ?? "";
+      const ftsUrl = docUrl
+        ?? (tenderId ? `https://www.find-tender.service.gov.uk/Notice/${tenderId}` : null)
+        ?? "https://www.find-tender.service.gov.uk/";
       out.push({
         id: pkg.ocid,
         source: "Find a Tender",
@@ -85,9 +89,7 @@ async function fetchFTS() {
         pre_engagement: null,
         question_deadline: t.enquiryPeriod?.endDate ?? null,
         submission_deadline: submissionDeadline,
-        url: noticeId
-          ? `https://www.find-tender.service.gov.uk/Notice/${noticeId}`
-          : "https://www.find-tender.service.gov.uk/"
+        url: ftsUrl
       });
     }
     next = data.links?.next ?? null;
@@ -129,8 +131,7 @@ async function fetchCF() {
   return out;
 }
 
-/* ---- 3. SELL2WALES ---- */
-// Routed via Cloudflare Worker proxy (direct requests blocked from GitHub Actions)
+/* ---- 3. SELL2WALES & PUBLIC CONTRACTS SCOTLAND ---- */
 const PROXY = "https://bidpilot-proxy.elliot-thorne.workers.dev/proxy";
 
 async function fetchMonthly(source, ocidPrefix, portalBase) {
@@ -168,9 +169,7 @@ async function fetchMonthly(source, ocidPrefix, portalBase) {
           pre_engagement: null,
           question_deadline: t.enquiryPeriod?.endDate ?? null,
           submission_deadline: submissionDeadline,
-          url: docUrl ?? (noticeNum
-            ? `https://www.${portalBase}/search/search_switch.aspx?ID=${noticeNum}`
-            : `https://www.${portalBase}/`)
+          url: docUrl ?? (noticeNum ? `https://www.${portalBase}/search/search_switch.aspx?ID=${noticeNum}` : `https://www.${portalBase}/`)
         });
       }
     }
@@ -179,14 +178,8 @@ async function fetchMonthly(source, ocidPrefix, portalBase) {
   return out.filter(r => { if(seen.has(r.id)) return false; seen.add(r.id); return true; });
 }
 
-async function fetchS2W() {
-  return fetchMonthly("s2w", "ocds-kuma6s-", "sell2wales.gov.wales");
-}
-
-/* ---- 4. PUBLIC CONTRACTS SCOTLAND ---- */
-async function fetchPCS() {
-  return fetchMonthly("pcs", "ocds-r6ebe6-", "publiccontractsscotland.gov.uk");
-}
+async function fetchS2W() { return fetchMonthly("s2w", "ocds-kuma6s-", "sell2wales.gov.wales"); }
+async function fetchPCS() { return fetchMonthly("pcs", "ocds-r6ebe6-", "publiccontractsscotland.gov.uk"); }
 
 /* ---- Run, merge, de-duplicate, upsert into Supabase ---- */
 async function main() {
@@ -209,6 +202,20 @@ async function main() {
     console.error("Supabase upsert failed:", error.message);
     process.exit(1);
   }
+
+  // Clean up tenders whose deadline passed more than 7 days ago
+  const oneWeekAgo = new Date(Date.now() - 7 * 864e5).toISOString();
+  const { error: cleanupError, count } = await supabase
+    .from("tenders")
+    .delete({ count: "exact" })
+    .lt("submission_deadline", oneWeekAgo);
+
+  if (cleanupError) {
+    console.error("Cleanup failed:", cleanupError.message);
+  } else {
+    console.log(`Cleaned up ${count ?? 0} expired tenders from Supabase.`);
+  }
+
   console.log(`Upserted ${rows.length} live opportunities into Supabase (FTS ${fts.length}, CF ${cf.length}, S2W ${s2w.length}, PCS ${pcs.length}).`);
 }
 
