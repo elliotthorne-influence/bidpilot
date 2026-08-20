@@ -365,6 +365,7 @@ const TODAY = (() => { const d = new Date(); d.setHours(0,0,0,0); return d; })()
 const pipeline = new Set();
 const records  = [];
 let activeFilter = "all";
+let activeSource = "all";
 let searchTerm   = "";
 
 /* ---- small DOM helpers ---- */
