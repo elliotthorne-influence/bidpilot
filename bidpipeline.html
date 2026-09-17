@@ -239,7 +239,6 @@
 <footer>Influence Digital &middot; BidPilot &middot; opportunities are real notices from Find a Tender &amp; Contracts Finder</footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 "use strict";
 
@@ -283,46 +282,13 @@ function deriveDisciplines(text){
 /* Map one record from tenders.json (OCDS-shaped) into the UI shape.   *
  * Accepts either the slim fields the fetch script writes, or close     *
  * variants, so minor feed changes don't break the UI.                  */
-/* Build reliable portal URL from stored data */
-function portalUrl(rec) {
-  const raw = rec.url ?? "";
-  const title = rec.title ?? "";
-  const src = rec.source ?? rec.src ?? "";
-  const ocid = rec.id ?? "";
-
-  // Use stored URL if it looks like a real notice page
-  if (raw && raw !== "#" &&
-      !raw.endsWith("find-tender.service.gov.uk/") &&
-      !raw.endsWith("contractsfinder.service.gov.uk/") &&
-      !raw.endsWith("sell2wales.gov.wales/") &&
-      !raw.endsWith("publiccontractsscotland.gov.uk/")) {
-    return raw;
-  }
-
-  // Fall back to search
-  const encoded = encodeURIComponent(title);
-  if (src === "Contracts Finder" || raw.includes("contractsfinder")) {
-    return `https://www.contractsfinder.service.gov.uk/Search/Results?keyword=${encoded}`;
-  }
-  if (src === "Public Contracts Scotland" || raw.includes("publiccontractsscotland")) {
-    return `https://www.publiccontractsscotland.gov.uk/Search/Search_Switch.aspx?SearchType=1&keyword=${encoded}`;
-  }
-  if (src === "Sell2Wales" || raw.includes("sell2wales")) {
-    return `https://www.sell2wales.gov.wales/search/search_results.aspx?keyword=${encoded}`;
-  }
-  // Find a Tender — use OCID-derived notice ID
-  const noticeRef = ocid.replace("ocds-h6vhtk-", "").trim();
-  if (noticeRef) return `https://www.find-tender.service.gov.uk/Notice/${noticeRef}`;
-  return `https://www.find-tender.service.gov.uk/Search/Results?searchTerms=${encoded}`;
-}
-
 function normalise(rec, i){
   const title = rec.title ?? rec.tender?.title ?? "Untitled notice";
   const buyer = rec.buyer ?? rec.tender?.buyer ?? "";
   const syn   = rec.description ?? rec.synopsis ?? rec.syn ?? "";
-  const q     = rec.questionDeadline   ?? rec.question_deadline  ?? rec.q ?? null;
-  const s     = rec.submissionDeadline ?? rec.submission_deadline ?? rec.s ?? null;
-  const pre   = rec.preEngagement ?? rec.pre_engagement ?? rec.pre ?? null;
+  const q     = rec.questionDeadline   ?? rec.q ?? null;
+  const s     = rec.submissionDeadline ?? rec.s ?? null;
+  const pre   = rec.preEngagement ?? rec.pre ?? null;
 
   // Derive the dominant stage from which dates exist / are still ahead.
   let stage = rec.stage;
@@ -337,7 +303,7 @@ function normalise(rec, i){
     id:    rec.id ?? rec.ocid ?? `t-${i}`,
     title, buyer,
     src:   rec.source ?? rec.src ?? "Find a Tender",
-    url:   portalUrl(rec),
+    url:   rec.url ?? "#",
     disc:  Array.isArray(rec.disc) ? rec.disc : deriveDisciplines(`${title} ${syn}`),
     stage,
     syn:   syn.length > 600 ? syn.slice(0,597) + "…" : syn,
@@ -347,27 +313,22 @@ function normalise(rec, i){
 }
 
 /* Load the feed, normalise, render. Falls back to the bundled sample.  */
-const sbClient = window.supabase.createClient(
-  "https://hoefxgoakftdwkpselmo.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhvZWZ4Z29ha2Z0ZHdrcHNlbG1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMDQ4NDksImV4cCI6MjA5NjU4MDg0OX0.oX3UcS9s8OyArGT06Nne4pQEnWbsTnsJyp0l_EA9K8Y"
-);
-
 async function loadTenders(){
   showFeedState("loading");
   try{
-    const { data, error } = await sbClient
-      .from("tenders")
-      .select("*")
-      .order("submission_deadline", { ascending: true, nullsFirst: false });
-    if(error) throw new Error(error.message);
-    if(!data.length) throw new Error("empty feed");
-    TENDERS = data.map(normalise);
-    showFeedState("ok", {count:TENDERS.length, generatedAt:new Date().toISOString()});
+    const res = await fetch("tenders.json", {cache:"no-store"});
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const raw = await res.json();
+    const rows = Array.isArray(raw) ? raw : (raw.tenders ?? raw.results ?? []);
+    if(!rows.length) throw new Error("empty feed");
+    TENDERS = rows.map(normalise);
+    showFeedState("ok", {count:TENDERS.length, generatedAt:raw.generatedAt});
   }catch(err){
     TENDERS = FALLBACK.map(normalise);
     showFeedState("error", {message:err.message});
   }
-  await loadPipeline();
+  renderList();
+  renderAgenda();
 }
 
 /* Surface feed status in the Discover sub-header + banner.             */
@@ -402,36 +363,6 @@ const TODAY = (() => { const d = new Date(); d.setHours(0,0,0,0); return d; })()
 
 /* ---- app state ---- */
 const pipeline = new Set();
-
-async function loadPipeline(){
-  const { data } = await sbClient.from("pipeline").select("tender_id");
-  if(data) data.forEach(row => pipeline.add(row.tender_id));
-  renderList();
-  renderAgenda();
-}
-
-async function removeFromPipeline(id){
-  pipeline.delete(id);
-  const { error } = await sbClient.from("pipeline").delete().eq("tender_id", id);
-  if(error) console.warn("Pipeline remove failed:", error.message);
-  renderList();
-  renderAgenda();
-}
-
-async function loadPipeline(){
-  const { data } = await sbClient.from("pipeline").select("tender_id");
-  if(data) data.forEach(row => pipeline.add(row.tender_id));
-  renderList();
-  renderAgenda();
-}
-
-async function removeFromPipeline(id){
-  pipeline.delete(id);
-  const { error } = await sbClient.from("pipeline").delete().eq("tender_id", id);
-  if(error) console.warn("Pipeline remove failed:", error.message);
-  renderList();
-  renderAgenda();
-}
 const records  = [];
 let activeFilter = "all";
 let searchTerm   = "";
@@ -440,7 +371,7 @@ let searchTerm   = "";
 const $  = (sel, root=document) => root.querySelector(sel);
 const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 const esc = (str="") => str.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const parseDate = iso => new Date(iso.includes("T") ? iso : iso + "T00:00:00");
+const parseDate = iso => new Date(iso + "T00:00:00");
 const fmtShort = iso => iso ? parseDate(iso).toLocaleDateString("en-GB",{day:"2-digit",month:"short"}) : "—";
 const fmtLong  = iso => iso ? parseDate(iso).toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"}) : "—";
 const daysTo   = iso => Math.ceil((parseDate(iso) - TODAY) / 86400000);
@@ -494,20 +425,14 @@ function renderList(){
 grid.addEventListener("click", e => {
   const btn = e.target.closest(".js-pursue");
   if(!btn) return;
-  if(pipeline.has(btn.dataset.id)){
-    removeFromPipeline(btn.dataset.id);
-  } else {
-    pursue(btn.dataset.id);
-  }
+  pursue(btn.dataset.id);
 });
 
-async function pursue(id){
+function pursue(id){
   if(pipeline.has(id)) return;
   pipeline.add(id);
   const t = TENDERS.find(x => x.id === id);
-  const { error } = await sbClient.from("pipeline").insert({ tender_id: id, added_by: "team" });
-  if(error) console.warn("Pipeline save failed:", error.message);
-  toast(`Added to pipeline: ${t?.buyer ?? id}`);
+  toast(`Added to pipeline: ${t.buyer}`);
   renderList();
   renderAgenda();
 }
@@ -575,9 +500,17 @@ function eventChip(ev, key){
         <p class="syn">${esc(t.syn)}</p>
         <a class="btn portal" href="${esc(t.url)}" target="_blank" rel="noopener noreferrer"
            aria-label="View ${esc(t.buyer)} notice on ${esc(t.src)} (opens in new tab)">View on portal &#8599;</a>
+        <button class="js-remove" data-id="${esc(String(t.id))}" style="margin-top:8px;background:none;border:1px solid #ccc;color:#666;padding:6px 12px;cursor:pointer;font-size:12px;width:100%;">&#10005; Remove from pipeline</button>
       </div>
     </div>`;
 }
+
+/* remove from pipeline */
+agenda.addEventListener("click", e => {
+  const btn = e.target.closest(".js-remove");
+  if(!btn) return;
+  removeFromPipeline(btn.dataset.id);
+});
 
 function renderAgenda(){
   const events = buildEvents();
