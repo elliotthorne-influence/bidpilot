@@ -425,14 +425,20 @@ function renderList(){
 grid.addEventListener("click", e => {
   const btn = e.target.closest(".js-pursue");
   if(!btn) return;
-  pursue(btn.dataset.id);
+  if(pipeline.has(btn.dataset.id)){
+    removeFromPipeline(btn.dataset.id);
+  } else {
+    pursue(btn.dataset.id);
+  }
 });
 
-function pursue(id){
+async function pursue(id){
   if(pipeline.has(id)) return;
   pipeline.add(id);
   const t = TENDERS.find(x => x.id === id);
-  toast(`Added to pipeline: ${t.buyer}`);
+  const { error } = await sbClient.from("pipeline").insert({ tender_id: id, added_by: "team" });
+  if(error) console.warn("Pipeline save failed:", error.message);
+  toast(`Added to pipeline: ${t?.buyer ?? id}`);
   renderList();
   renderAgenda();
 }
@@ -487,7 +493,10 @@ function eventChip(ev, key){
           <div class="ag-event__name" title="${esc(t.buyer)}">${esc(t.buyer)}</div>
           <div class="ag-event__role">${st.label} &middot; ${esc(t.title)}</div>
         </div>
-        <span class="ag-event__stage">${st.label}</span>
+        <button class="js-remove" data-id="${esc(String(t.id))}"
+                title="Remove from pipeline"
+                style="background:none;border:none;cursor:pointer;color:#999;font-size:18px;padding:4px 8px;line-height:1;flex-shrink:0"
+                aria-label="Remove ${esc(t.buyer)} from pipeline">&#10005;</button>
       </div>
       <div class="ag-event__detail" id="${panelId}" role="region" aria-labelledby="${btnId}" hidden>
         <dl>
@@ -500,18 +509,12 @@ function eventChip(ev, key){
         <p class="syn">${esc(t.syn)}</p>
         <a class="btn portal" href="${esc(t.url)}" target="_blank" rel="noopener noreferrer"
            aria-label="View ${esc(t.buyer)} notice on ${esc(t.src)} (opens in new tab)">View on portal &#8599;</a>
-        <button class="js-remove" data-id="${esc(String(t.id))}" style="margin-top:8px;background:none;border:1px solid #ccc;color:#666;padding:6px 12px;cursor:pointer;font-size:12px;width:100%;">&#10005; Remove from pipeline</button>
+
       </div>
     </div>`;
 }
 
-/* remove from pipeline */
-agenda.addEventListener("click", e => {
-  const btn = e.target.closest(".js-remove");
-  if(!btn) return;
-  removeFromPipeline(btn.dataset.id);
-});
-
+/* remove from pipeline — handled via the single agenda click listener below */
 function renderAgenda(){
   const events = buildEvents();
   if(!events.length){
@@ -562,8 +565,12 @@ function flagTruncatedEvents(){
   });
 }
 
-/* accordion toggle (event delegation) */
+/* accordion toggle + remove button (event delegation) */
 agenda.addEventListener("click", e => {
+  // Handle remove button
+  const removeBtn = e.target.closest(".js-remove");
+  if(removeBtn){ removeFromPipeline(removeBtn.dataset.id); return; }
+
   const icon = e.target.closest(".ag-event__icon");
   if(!icon) return;
   const chip   = icon.closest(".ag-event");
