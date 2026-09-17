@@ -239,6 +239,7 @@
 <footer>Influence Digital &middot; BidPilot &middot; opportunities are real notices from Find a Tender &amp; Contracts Finder</footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 "use strict";
 
@@ -286,9 +287,9 @@ function normalise(rec, i){
   const title = rec.title ?? rec.tender?.title ?? "Untitled notice";
   const buyer = rec.buyer ?? rec.tender?.buyer ?? "";
   const syn   = rec.description ?? rec.synopsis ?? rec.syn ?? "";
-  const q     = rec.questionDeadline   ?? rec.q ?? null;
-  const s     = rec.submissionDeadline ?? rec.s ?? null;
-  const pre   = rec.preEngagement ?? rec.pre ?? null;
+  const q     = rec.questionDeadline   ?? rec.question_deadline  ?? rec.q ?? null;
+  const s     = rec.submissionDeadline ?? rec.submission_deadline ?? rec.s ?? null;
+  const pre   = rec.preEngagement ?? rec.pre_engagement ?? rec.pre ?? null;
 
   // Derive the dominant stage from which dates exist / are still ahead.
   let stage = rec.stage;
@@ -316,19 +317,19 @@ function normalise(rec, i){
 async function loadTenders(){
   showFeedState("loading");
   try{
-    const res = await fetch("tenders.json", {cache:"no-store"});
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
-    const raw = await res.json();
-    const rows = Array.isArray(raw) ? raw : (raw.tenders ?? raw.results ?? []);
-    if(!rows.length) throw new Error("empty feed");
-    TENDERS = rows.map(normalise);
-    showFeedState("ok", {count:TENDERS.length, generatedAt:raw.generatedAt});
+    const { data, error } = await sbClient
+      .from("tenders")
+      .select("*")
+      .order("submission_deadline", { ascending: true, nullsFirst: false });
+    if(error) throw new Error(error.message);
+    if(!data.length) throw new Error("empty feed");
+    TENDERS = data.map(normalise);
+    showFeedState("ok", {count:TENDERS.length, generatedAt:new Date().toISOString()});
   }catch(err){
     TENDERS = FALLBACK.map(normalise);
     showFeedState("error", {message:err.message});
   }
-  renderList();
-  renderAgenda();
+  await loadPipeline();
 }
 
 /* Surface feed status in the Discover sub-header + banner.             */
@@ -362,7 +363,27 @@ const STAGE = {
 const TODAY = (() => { const d = new Date(); d.setHours(0,0,0,0); return d; })();
 
 /* ---- app state ---- */
+const sbClient = window.supabase.createClient(
+  "https://hoefxgoakftdwkpselmo.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhvZWZ4Z29ha2Z0ZHdrcHNlbG1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMDQ4NDksImV4cCI6MjA5NjU4MDg0OX0.oX3UcS9s8OyArGT06Nne4pQEnWbsTnsJyp0l_EA9K8Y"
+);
+
 const pipeline = new Set();
+
+async function loadPipeline(){
+  const { data } = await sbClient.from("pipeline").select("tender_id");
+  if(data) data.forEach(row => pipeline.add(row.tender_id));
+  renderList();
+  renderAgenda();
+}
+
+async function removeFromPipeline(id){
+  pipeline.delete(id);
+  const { error } = await sbClient.from("pipeline").delete().eq("tender_id", id);
+  if(error) console.warn("Pipeline remove failed:", error.message);
+  renderList();
+  renderAgenda();
+}
 const records  = [];
 let activeFilter = "all";
 let searchTerm   = "";
@@ -371,7 +392,7 @@ let searchTerm   = "";
 const $  = (sel, root=document) => root.querySelector(sel);
 const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 const esc = (str="") => str.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const parseDate = iso => new Date(iso + "T00:00:00");
+const parseDate = iso => new Date(iso.includes("T") ? iso : iso + "T00:00:00");
 const fmtShort = iso => iso ? parseDate(iso).toLocaleDateString("en-GB",{day:"2-digit",month:"short"}) : "—";
 const fmtLong  = iso => iso ? parseDate(iso).toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"}) : "—";
 const daysTo   = iso => Math.ceil((parseDate(iso) - TODAY) / 86400000);
